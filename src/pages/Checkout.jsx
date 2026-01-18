@@ -1,0 +1,1426 @@
+
+//old working code without responsive code
+
+// import { useDispatch, useSelector } from "react-redux";
+// import { Navigate, useNavigate } from "react-router-dom";
+// import { useState } from "react";
+// import { buyNowOrderAPI,initiate, verify } from "../api/order.api";  // Changed import
+// import toast from "react-hot-toast";
+// import {
+//   FiMapPin,
+//   FiCreditCard,
+//   FiCheck,
+//   FiLock,
+//   FiChevronRight,
+//   FiPackage,
+//   FiTruck,
+//   FiHome,
+//   FiUser
+// } from "react-icons/fi";
+// import axios from "axios";
+// import api from "../api/axios";
+// import { getCartAPI } from "../api/cart.api";
+// import { setCartFromBackend } from "../store/cart.store";
+
+// const Checkout = () => {
+//   const { isAuthenticated, user } = useSelector((state) => state.auth);
+//   const { items } = useSelector((state) => state.checkout);
+
+//   console.log("item from auth Store", user);
+//   console.log("user address", user?.addresses);
+//   const addresses = user?.addresses || [];
+//   const defaultAddress = addresses.find((a) => a.isDefault) || addresses[0];
+
+//   const [activeStep, setActiveStep] = useState(1);
+//   const [selectedAddressId, setSelectedAddressId] = useState(
+//     defaultAddress?._id || null
+//   );
+//   const [orderPlaced, setOrderPlaced] = useState(false);
+//   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+
+//   // Redirect guards
+//   if (!isAuthenticated) return <Navigate to="/login" />;
+//   if (!items || items.length === 0) return <Navigate to="/" />;
+
+//   const totalAmount = items.reduce(
+//     (sum, item) => sum + item.totalPrice,
+//     0
+//   );
+
+//   // Handle no addresses
+//   if (!addresses.length) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+//         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+//           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+//             <FiMapPin className="text-3xl text-red-500" />
+//           </div>
+//           <h2 className="text-2xl font-bold text-gray-800 mb-3">
+//             No Address Found
+//           </h2>
+//           <p className="text-gray-600 mb-6">
+//             You need to add a delivery address before placing an order.
+//           </p>
+//           <button
+//             onClick={() => (window.location.href = "/profile/addresses")}
+//             className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:opacity-90 transition shadow-md"
+//           >
+//             Add Address
+//           </button>
+//         </div>
+//       </div>
+//     );
+//   }
+
+// const handlePlaceOrder = async () => {
+//   try {
+
+    
+//       setIsPlacingOrder(true);
+
+//     let orderRes;
+
+//     if (items.length === 1) {
+//       // BUY NOW FLOW
+//       const product = items[0];
+//       console.log("🛒 CHECKOUT ITEMS 👉", items);
+
+
+//       orderRes = await buyNowOrderAPI({
+//         productId: product.productId,
+//         variantId: product.variantId,  
+//         variantLabel: product.variantLabel,
+//         quantity: product.quantity,
+//         address: selectedAddressId,
+//       });
+//     } else {
+//       // CART FLOW (MULTIPLE PRODUCTS)
+//       orderRes = await api.post("/orders/cart/checkout", {
+//     address: selectedAddressId,
+//     items: items.map(item => ({
+//     productId: item.productId,
+//      variantId: item.variantId, 
+//     variantLabel: item.variantLabel,
+//     quantity: item.quantity,
+//     })),
+//   });
+
+//     }
+
+//     const orderId = orderRes.data.data._id;
+//     console.log("ORDER ID ", orderId);
+
+//     // INITIATE PAYMENT
+//     const paymentRes = await initiate({ orderId });
+
+//     const { razorpayOrderId, amount, key } = paymentRes.data.data;
+
+//     // OPEN RAZORPAY
+//       const options = {
+//     key,
+//     amount: amount * 100,
+//     currency: "INR",
+
+//     //  Company Name
+//     name: "Egg! ATM",
+
+//     // LOGO (must be public HTTPS)
+//     image: "https://res.cloudinary.com/dqtk1trh0/image/upload/v1768355429/Egg_ATM_Logo_s1yyhp.jpg",
+
+//     description: "Secure Checkout",
+
+//     order_id: razorpayOrderId,
+
+//     // Autofill customer info
+//     prefill: {
+//       name: user?.name || "",
+//       email: user?.email || "",
+//       contact: user?.phone || "",
+//     },
+
+//     //  Brand color
+//     theme: {
+//       color: "#faa807",
+//     },
+
+//       handler: async function (response) {
+//         console.log("Razorpay handler triggered");
+//         await verify({razorpay_order_id: response.razorpay_order_id,razorpay_payment_id: response.razorpay_payment_id,razorpay_signature: response.razorpay_signature,})
+//          console.log(" Payment verified");
+//         const cartRes = await getCartAPI();
+//         console.log("Cart API response:", cartRes.data.data);
+
+//         dispatch(setCartFromBackend(cartRes.data.data));
+
+//         toast.success(" Payment Successful");
+
+//         navigate("/products");
+//       },
+//     };
+
+//     new window.Razorpay(options).open();
+
+//   } catch (err) {
+//     console.error("PAYMENT ERROR ❌", err);
+//     toast.error("Order or payment failed");
+//   }
+// };
+
+
+
+
+//   // Success screen
+//   if (orderPlaced) {
+//     return (
+//       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
+//         <div className="max-w-lg w-full bg-white rounded-3xl shadow-2xl p-10 text-center animate-fadeIn">
+//           <div className="w-24 h-24 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
+//             <FiCheck className="text-4xl text-white" />
+//           </div>
+//           <h1 className="text-4xl font-bold text-gray-900 mb-4">
+//             🎉 Order Confirmed!
+//           </h1>
+//           <p className="text-gray-600 text-lg mb-8">
+//             Your order has been placed successfully. We'll notify you once it ships.
+//           </p>
+          
+//           <div className="bg-gray-50 rounded-xl p-6 mb-8">
+//             <div className="flex items-center justify-center gap-3 mb-4">
+//               <FiTruck className="text-2xl text-orange-500" />
+//               <span className="font-semibold text-gray-800">Estimated Delivery</span>
+//             </div>
+//             <p className="text-2xl font-bold text-gray-900">3-5 Business Days</p>
+//           </div>
+          
+//           <button
+//             onClick={() => (window.location.href = "/orders")}
+//             className="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+//           >
+//             View My Orders
+//           </button>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // Fix the address selection logic in the JSX
+//   const selectedAddress = addresses.find((addr) => addr._id === selectedAddressId);
+
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+//       <div className="max-w-7xl mx-auto">
+//         {/* Header */}
+//         <div className="mb-10 text-center">
+//           <h1 className="text-4xl font-bold text-gray-900 mb-3">
+//             Complete Your Order
+//           </h1>
+//           <p className="text-gray-600 text-lg">
+//             Review your items and delivery details
+//           </p>
+//         </div>
+
+//         <div className="grid lg:grid-cols-3 gap-8">
+//           {/* Main Content - Left 2/3 */}
+//           <div className="lg:col-span-2 space-y-8">
+//             {/* Progress Steps */}
+//             <div className="bg-white rounded-2xl shadow-lg p-6">
+//               <div className="flex items-center justify-between mb-8">
+//                 {[
+//                   { number: 1, label: "Delivery Address", active: activeStep >= 1 },
+//                   { number: 2, label: "Continue to Proceed", active: activeStep >= 2 },
+//                   { number: 3, label: "Payment", active: activeStep >= 3 }
+//                 ].map((step) => (
+//                   <div key={step.number} className="flex items-center">
+//                     <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all
+//                       ${step.active 
+//                         ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg' 
+//                         : 'bg-gray-200 text-gray-400'
+//                       }`}
+//                     >
+//                       {step.number}
+//                     </div>
+//                     <div className="ml-3">
+//                       <div className="text-xs text-gray-500">Step {step.number}</div>
+//                       <div className="font-semibold">{step.label}</div>
+//                     </div>
+//                     {step.number < 3 && (
+//                       <div className="mx-6 w-20 h-1 bg-gray-200 rounded-full">
+//                         <div className={`h-full rounded-full transition-all duration-500
+//                           ${step.active ? 'bg-gradient-to-r from-orange-500 to-amber-500' : ''}`}
+//                           style={{ width: step.active ? '100%' : '0%' }}
+//                         ></div>
+//                       </div>
+//                     )}
+//                   </div>
+//                 ))}
+//               </div>
+
+//               {/* Delivery Address Section */}
+//               <div className="border-t pt-8">
+//                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+//                   <FiMapPin className="text-orange-500" />
+//                   Select Delivery Address
+//                 </h2>
+
+//                 <div className="grid md:grid-cols-2 gap-6">
+//                   {addresses.map((addr) => (
+//                     <div
+//                       key={addr._id}
+//                       onClick={() => setSelectedAddressId(addr._id)}
+//                       className={`border-2 rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:shadow-lg
+//                         ${selectedAddressId === addr._id
+//                           ? 'border-orange-500 bg-gradient-to-br from-orange-50 to-amber-50'
+//                           : 'border-gray-200 hover:border-orange-300'
+//                         }`}
+//                     >
+//                       <div className="flex justify-between items-start mb-4">
+//                         <div className="flex items-center gap-3">
+//                           <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center
+//                             ${selectedAddressId === addr._id 
+//                               ? 'border-orange-500 bg-orange-500' 
+//                               : 'border-gray-300'
+//                             }`}
+//                           >
+//                             {selectedAddressId === addr._id && (
+//                               <div className="w-2 h-2 rounded-full bg-white"></div>
+//                             )}
+//                           </div>
+//                           <div>
+//                             <h3 className="font-bold text-lg flex items-center gap-2">
+//                               <FiUser className="text-gray-500" />
+//                               {addr.fullName}
+//                             </h3>
+//                             {addr.isDefault && (
+//                               <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full mt-1 inline-block">
+//                                 DEFAULT ADDRESS
+//                               </span>
+//                             )}
+//                           </div>
+//                         </div>
+//                       </div>
+
+//                       <div className="space-y-2 pl-9">
+//                         <p className="text-gray-700 flex items-center gap-2">
+//                           <FiHome className="text-gray-400" />
+//                           {addr.line1}
+//                         </p>
+//                         {addr.line2 && (
+//                           <p className="text-gray-700">{addr.line2}</p>
+//                         )}
+//                         <p className="text-gray-600">
+//                           {addr.city}, {addr.state} - {addr.pincode}
+//                         </p>
+//                         <p className="text-gray-600 flex items-center gap-2">
+//                           <FiPackage className="text-gray-400" />
+//                           {addr.phone}
+//                         </p>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+
+//                 <button
+//                   onClick={() => {
+//                     if (!selectedAddressId) {
+//                       toast.error("Please select an address first");
+//                       return;
+//                     }
+//                     setActiveStep(2);
+//                   }}
+//                   className="mt-8 w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-2xl hover:shadow-lg transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-3"
+//                 >
+//                   Continue to Proceed
+//                   <FiChevronRight className="text-xl" />
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Order Summary - Right 1/3 */}
+//           <div className="space-y-8">
+//             {/* Order Summary Card */}
+//             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+//               <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-4">
+//                 Order Summary
+//               </h2>
+
+//               <div className="space-y-4 mb-6">
+//                 <div className="flex justify-between items-center">
+//                   <span className="text-gray-600">Subtotal</span>
+//                   <span className="font-medium">₹{totalAmount}</span>
+//                 </div>
+//                 <div className="flex justify-between items-center">
+//                   <span className="text-gray-600">Shipping</span>
+//                   <span className="font-medium text-green-600">FREE</span>
+//                 </div>
+//                 <div className="flex justify-between items-center">
+//                   <span className="text-gray-600">Tax</span>
+//                   <span className="font-medium">₹0</span>
+//                 </div>
+//               </div>
+
+//               <div className="border-t pt-4 mb-6">
+//                 <div className="flex justify-between items-center text-xl font-bold">
+//                   <span>Total Amount</span>
+//                   <span className="text-orange-600">₹{totalAmount}</span>
+//                 </div>
+//               </div>
+
+//               <button
+//                 onClick={handlePlaceOrder}
+//                 disabled={activeStep < 2 || isPlacingOrder || !selectedAddressId}
+//                 className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300
+//                   ${(activeStep >= 2 && !isPlacingOrder && selectedAddressId)
+//                     ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-xl hover:scale-[1.02]'
+//                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+//                   }`}
+//               >
+//                 {isPlacingOrder ? (
+//                   <div className="flex items-center justify-center gap-2">
+//                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+//                     Placing Order...
+//                   </div>
+//                 ) : (
+//                   "Place Order"
+//                 )}
+//               </button>
+
+//               <div className="mt-6 pt-6 border-t">
+//                 <div className="flex items-center gap-3 text-gray-600">
+//                   <FiLock className="text-green-500 text-xl" />
+//                   <div>
+//                     <p className="font-medium">Secure Checkout</p>
+//                     <p className="text-sm text-gray-500">Your payment is safe and secure</p>
+//                   </div>
+//                 </div>
+//               </div>
+
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Add some animation styles */}
+//       <style jsx>{`
+//         @keyframes fadeIn {
+//           from { opacity: 0; transform: translateY(20px); }
+//           to { opacity: 1; transform: translateY(0); }
+//         }
+//         .animate-fadeIn {
+//           animation: fadeIn 0.6s ease-out;
+//         }
+//       `}</style>
+//     </div>
+//   );
+// };
+
+// export default Checkout;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//new code with responsive 
+
+
+
+
+
+
+
+
+import { useDispatch, useSelector } from "react-redux";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { buyNowOrderAPI, initiate, verify } from "../api/order.api";
+import toast from "react-hot-toast";
+import {
+  FiMapPin,
+  FiCreditCard,
+  FiCheck,
+  FiLock,
+  FiChevronRight,
+  FiPackage,
+  FiTruck,
+  FiHome,
+  FiUser,
+  FiChevronLeft,
+  FiShoppingBag,
+  FiShield,
+  FiClock,
+  FiEdit2,
+  FiPlus,
+  FiShoppingCart
+} from "react-icons/fi";
+import { FaRupeeSign } from "react-icons/fa";
+import axios from "axios";
+import api from "../api/axios";
+import { getCartAPI } from "../api/cart.api";
+import { setCartFromBackend } from "../store/cart.store";
+
+const Checkout = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { items } = useSelector((state) => state.checkout);
+  const [isMobile, setIsMobile] = useState(false);
+
+
+  console.log("items product", items);
+  console.log("item from auth Store", user);
+  console.log("user address", user?.addresses);
+  
+  const addresses = user?.addresses || [];
+  // Get only the default address or first address
+  const defaultAddress = addresses.find((a) => a.isDefault) || addresses[0];
+  
+  const [activeStep, setActiveStep] = useState(1);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState(
+    defaultAddress?._id || null
+  );
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+const [processingMessage, setProcessingMessage] = useState("");
+
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Detect mobile screen
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Redirect guards
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (!items || items.length === 0) return <Navigate to="/" />;
+
+  // If no address exists
+  if (!defaultAddress) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 sm:p-8 text-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+            <FiMapPin className="text-2xl sm:text-3xl text-red-500" />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-3">
+            No Address Found
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base mb-4 sm:mb-6">
+            Please add an address in your profile to proceed with checkout.
+          </p>
+          <button
+            onClick={() => navigate("/profile/addresses")}
+            className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:opacity-90 transition shadow-md text-sm sm:text-base"
+          >
+            Add Address in Profile
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const totalAmount = items.reduce(
+    (sum, item) => sum + item.totalPrice,
+    0
+  );
+
+  // Helper function to get image URL from item
+  const getItemImage = (item) => {
+    if (item.image) {
+      return item.image;
+    }
+    
+    if (item.productId && item.productId.images && item.productId.images.length > 0) {
+      return item.productId.images[0];
+    }
+    
+    if (item.mainImage) {
+      return item.mainImage;
+    }
+    
+    return "https://via.placeholder.com/150?text=No+Image";
+  };
+
+  // Helper function to get product name from item
+  const getItemName = (item) => {
+    if (item.name) {
+      return item.name;
+    }
+    
+    if (item.productId && item.productId.name) {
+      return item.productId.name;
+    }
+    
+    return "Product Name Not Available";
+  };
+
+  // const handlePlaceOrder = async () => {
+  //   try {
+  //     setIsPlacingOrder(true);
+
+  //     let orderRes;
+
+  //     if (items.length === 1) {
+  //       // BUY NOW FLOW
+  //       const product = items[0];
+  //       console.log("🛒 CHECKOUT ITEMS 👉", items);
+
+  //       orderRes = await buyNowOrderAPI({
+  //         productId: product.productId?._id || product.productId,
+  //         variantId: product.variantId,
+  //         variantLabel: product.variantLabel,
+  //         quantity: product.quantity,
+  //         address: defaultAddress._id, // Use default address ID
+  //       });
+  //     } else {
+  //       // CART FLOW (MULTIPLE PRODUCTS)
+  //       orderRes = await api.post("/orders/cart/checkout", {
+  //         address: defaultAddress._id, // Use default address ID
+  //         items: items.map(item => ({
+  //           productId: item.productId?._id || item.productId,
+  //           variantId: item.variantId,
+  //           variantLabel: item.variantLabel,
+  //           quantity: item.quantity,
+  //         })),
+  //       });
+  //     }
+
+  //     const orderId = orderRes.data.data._id;
+  //     console.log("ORDER ID ", orderId);
+
+  //     // INITIATE PAYMENT
+  //     const paymentRes = await initiate({ orderId });
+
+  //     const { razorpayOrderId, amount, key } = paymentRes.data.data;
+
+  //     // OPEN RAZORPAY
+  //     const options = {
+  //       key,
+  //       amount: amount * 100,
+  //       currency: "INR",
+  //       name: "EGG! ATM",
+  //       image: "https://res.cloudinary.com/dqtk1trh0/image/upload/v1768355429/Egg_ATM_Logo_s1yyhp.jpg",
+  //       description: "Secure Checkout",
+  //       order_id: razorpayOrderId,
+  //       prefill: {
+  //         name: user?.name || "",
+  //         email: user?.email || "",
+  //         contact: user?.phone || "",
+  //       },
+  //       theme: {
+  //         color: "#faa807",
+  //       },
+  //       handler: async function (response) {
+  //         console.log("Razorpay handler triggered");
+  //         await verify({
+  //           razorpay_order_id: response.razorpay_order_id,
+  //           razorpay_payment_id: response.razorpay_payment_id,
+  //           razorpay_signature: response.razorpay_signature,
+  //         });
+  //         console.log(" Payment verified");
+  //         const cartRes = await getCartAPI();
+  //         console.log("Cart API response:", cartRes.data.data);
+
+  //         dispatch(setCartFromBackend(cartRes.data.data));
+
+  //         toast.success(" Payment Successful");
+
+  //         navigate("/products");
+  //       },
+  //     };
+
+  //     new window.Razorpay(options).open();
+  //   } catch (err) {
+  //     console.error("PAYMENT ERROR ❌", err);
+  //     toast.error("Order or payment failed");
+  //   } finally {
+  //     setIsPlacingOrder(false);
+  //   }
+  // };
+
+
+
+
+
+//   const handlePlaceOrder = async () => {
+//   try {
+
+    
+//       setIsPlacingOrder(true);
+
+//     let orderRes;
+
+//     if (items.length === 1) {
+//       // BUY NOW FLOW
+//       const product = items[0];
+//       console.log("🛒 CHECKOUT ITEMS 👉", items);
+
+
+//       orderRes = await buyNowOrderAPI({
+//         productId: product.productId,
+//         variantId: product.variantId,  
+//         variantLabel: product.variantLabel,
+//         quantity: product.quantity,
+//         address: selectedAddressId,
+//       });
+//     } else {
+//       // CART FLOW (MULTIPLE PRODUCTS)
+//       orderRes = await api.post("/orders/cart/checkout", {
+//     address: selectedAddressId,
+//     items: items.map(item => ({
+//     productId: item.productId,
+//      variantId: item.variantId, 
+//     variantLabel: item.variantLabel,
+//     quantity: item.quantity,
+//     })),
+//   });
+
+//     }
+
+//     const orderId = orderRes.data.data._id;
+//     console.log("ORDER ID ", orderId);
+
+//     // INITIATE PAYMENT
+//     const paymentRes = await initiate({ orderId });
+
+//     const { razorpayOrderId, amount, key } = paymentRes.data.data;
+
+//     // OPEN RAZORPAY
+//       const options = {
+//     key,
+//     amount: amount * 100,
+//     currency: "INR",
+
+//     //  Company Name
+//     name: "Egg! ATM",
+
+//     // LOGO (must be public HTTPS)
+//     image: "https://res.cloudinary.com/dqtk1trh0/image/upload/v1768355429/Egg_ATM_Logo_s1yyhp.jpg",
+
+//     description: "Secure Checkout",
+
+//     order_id: razorpayOrderId,
+
+//     // Autofill customer info
+//     prefill: {
+//       name: user?.name || "",
+//       email: user?.email || "",
+//       contact: user?.phone || "",
+//     },
+
+//     //  Brand color
+//     theme: {
+//       color: "#faa807",
+//     },
+
+//       handler: async function (response) {
+//         console.log("Razorpay handler triggered");
+//         await verify({razorpay_order_id: response.razorpay_order_id,razorpay_payment_id: response.razorpay_payment_id,razorpay_signature: response.razorpay_signature,})
+//          console.log(" Payment verified");
+//         const cartRes = await getCartAPI();
+//         console.log("Cart API response:", cartRes.data.data);
+
+//         dispatch(setCartFromBackend(cartRes.data.data));
+
+//         toast.success(" Payment Successful");
+
+//         navigate("/products");
+//       },
+//     };
+
+//     new window.Razorpay(options).open();
+
+//   } catch (err) {
+//     console.error("PAYMENT ERROR ❌", err);
+//     toast.error("Order or payment failed");
+//   }
+// };
+
+
+
+const handlePlaceOrder = async () => {
+  try {
+    setIsPlacingOrder(true);
+
+    const orderRes = await api.post("/orders/cart/checkout", {
+      address: selectedAddressId,
+      items: items.map(item => ({
+        productId: item.productId._id || item.productId,
+        variantLabel: item.variantLabel,
+        quantity: item.quantity,
+      })),
+    });
+
+    const orderId = orderRes.data.data._id;
+
+    const paymentRes = await initiate({ orderId });
+    const { razorpayOrderId, amount, key } = paymentRes.data.data;
+
+    const options = {
+      key,
+      amount: amount * 100,
+      currency: "INR",
+      name: "Egg! ATM",
+      image: "https://res.cloudinary.com/dqtk1trh0/image/upload/v1768355429/Egg_ATM_Logo_s1yyhp.jpg",
+      order_id: razorpayOrderId,
+      theme: { color: "#faa807" },
+
+      handler: async (response) => {
+         setPaymentSuccess(true);
+         setProcessingMessage("Confirming your order...");
+
+        await verify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+        });
+
+        setProcessingMessage("Finalizing order & sending confirmation...");
+
+        const cartRes = await getCartAPI();
+        dispatch(setCartFromBackend(cartRes.data.data));
+
+        toast.success("Payment Successful");
+        // navigate("/products");
+        setTimeout(() => {
+          navigate("/products");
+        }, 1500);
+      }
+    };
+
+    new window.Razorpay(options).open();
+
+  } catch (err) {
+    toast.error("Order or payment failed");
+  } finally {
+    setIsPlacingOrder(false);
+  }
+};
+
+
+
+  // Format address for display
+  
+  
+  
+  
+  const formatAddress = (address) => {
+    if (!address) return [];
+    
+    const parts = [];
+    
+    if (address.line1) {
+      parts.push(address.line1);
+    }
+    
+    if (address.line2) {
+      parts.push(address.line2);
+    }
+    
+    const locationParts = [];
+    if (address.city) locationParts.push(address.city);
+    if (address.state) locationParts.push(address.state);
+    if (address.pincode) locationParts.push(address.pincode);
+    
+    if (locationParts.length > 0) {
+      parts.push(locationParts.join(", "));
+    }
+    
+    if (address.landmark) {
+      parts.push(`Landmark: ${address.landmark}`);
+    }
+    
+    return parts;
+  };
+
+  // Render the single address card (only one address shown)
+  const renderSingleAddressCard = () => {
+    const addressParts = formatAddress(defaultAddress);
+    
+    return (
+      <div className="border-2 border-orange-300 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-md">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
+              <FiCheck className="text-white text-xs" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-gray-800 text-sm sm:text-base">
+                  {defaultAddress.fullName}
+                </h3>
+                {defaultAddress.isDefault && (
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    DEFAULT
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-600 text-xs sm:text-sm mt-0.5">
+                📱 {defaultAddress.phone}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Address Details */}
+        <div className="space-y-1.5 sm:space-y-2 pl-7 sm:pl-9">
+          {addressParts.map((part, index) => (
+            <p 
+              key={index} 
+              className="text-gray-700 text-xs sm:text-sm leading-relaxed"
+            >
+              {part}
+            </p>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Render order items preview
+  const renderOrderItemsPreview = () => {
+    return (
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6 mb-4 sm:mb-6">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+          <FiShoppingBag className="text-orange-500 text-lg sm:text-xl" />
+          Order Items ({items.length})
+        </h3>
+        
+        <div className="space-y-3 sm:space-y-4">
+          {items.map((item, index) => {
+            const imageUrl = getItemImage(item);
+            const productName = getItemName(item);
+            const variantLabel = item.variantLabel || "Standard";
+            const price = item.price || 0;
+            const quantity = item.quantity || 1;
+            const totalPrice = item.totalPrice || price * quantity;
+            
+            return (
+              <div 
+                key={index} 
+                className="flex items-center gap-3 sm:gap-4 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                {/* Product Image */}
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <img 
+                    src={imageUrl}
+                    alt={productName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                    }}
+                  />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
+                    <h4 className="font-medium text-gray-800 text-sm sm:text-base line-clamp-1">
+                      {productName}
+                    </h4>
+                    <p className="font-bold text-gray-900 text-sm sm:text-base">
+                      ₹{totalPrice}
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-1 sm:mt-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {variantLabel}
+                      </span>
+                      <span className="text-xs sm:text-sm text-gray-600">
+                        Qty: {quantity}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-0">
+                      ₹{price} each
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        {/* Order Summary - Shown only on mobile in the preview */}
+        {isMobile && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-gray-600 text-sm">Subtotal</span>
+              <span className="font-medium">₹{totalAmount}</span>
+            </div>
+            <div className="flex justify-between items-center mb-2">
+              {/* <span className="text-gray-600 text-sm">Shipping</span> */}
+              {/* <span className="font-medium text-green-600">FREE</span> */}
+            </div>
+            <div className="flex justify-between items-center text-lg font-bold pt-2 border-t">
+              <span>Total</span>
+              <span className="text-orange-600">₹{totalAmount}</span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Success screen
+  if (orderPlaced) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
+        <div className="max-w-lg w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-10 text-center animate-fadeIn">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-lg">
+            <FiCheck className="text-3xl sm:text-4xl text-white" />
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+            🎉 Order Confirmed!
+          </h1>
+          <p className="text-gray-600 text-base sm:text-lg mb-6 sm:mb-8">
+            Your order has been placed successfully. We'll notify you once it ships.
+          </p>
+          
+          <div className="bg-gray-50 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <FiTruck className="text-xl sm:text-2xl text-orange-500" />
+              <span className="font-semibold text-gray-800 text-sm sm:text-base">Estimated Delivery</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">3-5 Business Days</p>
+          </div>
+          
+          <button
+            onClick={() => navigate("/orders")}
+            className="w-full py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300 text-sm sm:text-base"
+          >
+            View My Orders
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentSuccess) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+      <div className="text-center max-w-md px-6">
+        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center animate-pulse">
+          <FiCheck className="text-4xl text-green-600" />
+        </div>
+
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Payment Successful 🎉
+        </h2>
+
+        <p className="text-gray-600 mb-4">
+          {processingMessage}
+        </p>
+
+        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-full bg-green-500 animate-progress"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-3 sm:px-4">
+      {/* Mobile Header */}
+      {isMobile && (
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 rounded-lg bg-white shadow-sm"
+            >
+              <FiChevronLeft className="text-xl text-gray-700" />
+            </button>
+            <h1 className="text-xl font-bold text-gray-900">
+              Checkout
+            </h1>
+          </div>
+          <button
+            onClick={() => navigate("/profile/addresses")}
+            className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+          >
+            Manage Address
+          </button>
+        </div>
+      )}
+
+      {/* Desktop Header */}
+      {!isMobile && (
+        <div className="mb-6 sm:mb-10 text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
+            Complete Your Order
+          </h1>
+          <p className="text-gray-600 text-base sm:text-lg">
+            Review your items and delivery details
+          </p>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
+          {/* Main Content - Left 2/3 */}
+          <div className="lg:w-2/3 space-y-4 sm:space-y-6 lg:space-y-8">
+            {/* Progress Steps - Mobile Version */}
+            {isMobile && (
+              <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold mb-1
+                      ${activeStep >= 1 
+                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' 
+                        : 'bg-gray-200 text-gray-400'
+                      }`}
+                    >
+                      1
+                    </div>
+                    <span className="text-xs font-medium">Order Items</span>
+                  </div>
+                  
+                  <div className="flex-1 h-1 mx-2 bg-gray-200">
+                    <div className={`h-full rounded-full transition-all duration-500
+                      ${activeStep >= 2 ? 'bg-gradient-to-r from-orange-500 to-amber-500' : ''}`}
+                      style={{ width: activeStep >= 2 ? '100%' : '0%' }}
+                    ></div>
+                  </div>
+                  
+                  <div className="flex flex-col items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold mb-1
+                      ${activeStep >= 2 
+                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' 
+                        : 'bg-gray-200 text-gray-400'
+                      }`}
+                    >
+                      2
+                    </div>
+                    <span className="text-xs font-medium">Delivery Address</span>
+                  </div>
+                  
+                  <div className="flex-1 h-1 mx-2 bg-gray-200">
+                    <div className={`h-full rounded-full transition-all duration-500
+                      ${activeStep >= 3 ? 'bg-gradient-to-r from-orange-500 to-amber-500' : ''}`}
+                      style={{ width: activeStep >= 3 ? '100%' : '0%' }}
+                    ></div>
+                  </div>
+                  
+                  <div className="flex flex-col items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold mb-1
+                      ${activeStep >= 3 
+                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' 
+                        : 'bg-gray-200 text-gray-400'
+                      }`}
+                    >
+                      3
+                    </div>
+                    <span className="text-xs font-medium">Payment</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Progress Steps - Desktop Version */}
+            {!isMobile && (
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <div className="flex items-center justify-between mb-8">
+                  {[
+                    { number: 1, label: "Order Items", active: activeStep >= 1 },
+                    { number: 2, label: "Delivery Address", active: activeStep >= 2 },
+                    { number: 3, label: "Payment", active: activeStep >= 3 }
+                  ].map((step) => (
+                    <div key={step.number} className="flex items-center">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all
+                        ${step.active 
+                          ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg' 
+                          : 'bg-gray-200 text-gray-400'
+                        }`}
+                      >
+                        {step.number}
+                      </div>
+                      <div className="ml-3">
+                        <div className="text-xs text-gray-500">Step {step.number}</div>
+                        <div className="font-semibold">{step.label}</div>
+                      </div>
+                      {step.number < 3 && (
+                        <div className="mx-6 w-20 h-1 bg-gray-200 rounded-full">
+                          <div className={`h-full rounded-full transition-all duration-500
+                            ${step.active ? 'bg-gradient-to-r from-orange-500 to-amber-500' : ''}`}
+                            style={{ width: step.active ? '100%' : '0%' }}
+                          ></div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Order Items Preview */}
+            {renderOrderItemsPreview()}
+
+            {/* Delivery Address Section - Now shows only one address */}
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+                  <FiMapPin className="text-orange-500 text-lg sm:text-xl" />
+                  Delivery Address
+                </h2>
+              </div>
+
+              {/* Single Address Card - Always shown */}
+              {renderSingleAddressCard()}
+
+              {/* Continue Button - Always enabled since we have a default address */}
+              <button
+                onClick={() => {
+                  setActiveStep(2);
+                  if (isMobile) {
+                    document.querySelector('.order-summary')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="mt-6 w-full py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-xl sm:rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base hover:shadow-lg hover:scale-[1.02]"
+              >
+                Continue to Proceed
+                <FiChevronRight className="text-lg" />
+              </button>
+            </div>
+          </div>
+
+          {/* Order Summary - Right 1/3 */}
+          <div className="lg:w-1/3 space-y-4 sm:space-y-6 lg:space-y-8">
+            {/* Order Summary Card */}
+            <div className="order-summary bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:sticky lg:top-8">
+              <h2 className="text-lg text-center sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 border-b pb-3 sm:pb-4">
+                Order Summary
+              </h2>
+
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 text-sm sm:text-base">Subtotal</span>
+                  <span className="font-medium text-sm sm:text-base">₹{totalAmount}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  {/* <span className="text-gray-600 text-sm sm:text-base">Shipping</span> */}
+                  {/* <span className="font-medium text-green-600 text-sm sm:text-base">FREE</span> */}
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 text-sm sm:text-base">Tax</span>
+                  <span className="font-medium text-sm sm:text-base">₹0</span>
+                </div>
+              </div>
+
+              <div className="border-t pt-3 sm:pt-4 mb-4 sm:mb-6">
+                <div className="flex justify-between items-center text-lg sm:text-xl font-bold">
+                  <span>Total Amount</span>
+                  <span className="text-orange-600">
+                    <span className="text-sm mr-1">₹</span>
+                    {totalAmount}
+                  </span>
+                </div>
+              </div>
+
+              {/* Selected Address Preview - Desktop */}
+              {!isMobile && defaultAddress && (
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-2 text-gray-700 mb-2">
+                    <FiMapPin className="text-orange-500" />
+                    <span className="text-sm font-medium">Delivering to:</span>
+                  </div>
+                  <div className="text-xs text-gray-600 space-y-1">
+                    <p className="font-medium">{defaultAddress.fullName}</p>
+                    <p className="line-clamp-2">{defaultAddress.line1}</p>
+                    {defaultAddress.line2 && (
+                      <p>{defaultAddress.line2}</p>
+                    )}
+                    <p>{defaultAddress.city}, {defaultAddress.state} - {defaultAddress.pincode}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Secure Payment Info */}
+              {/* <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="flex items-center gap-2 text-blue-700">
+                  <FiShield className="text-lg" />
+                  <span className="text-sm font-medium">Secure Payment</span>
+                </div>
+                <p className="text-xs text-blue-600 mt-1">
+                  Your payment is protected with 256-bit SSL encryption
+                </p>
+              </div> */}
+
+              <button
+                onClick={handlePlaceOrder}
+                disabled={activeStep < 2 || isPlacingOrder}
+                className={`w-full py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold transition-all duration-300 text-sm sm:text-base
+                  ${(activeStep >= 2 && !isPlacingOrder)
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-xl active:scale-95'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+              >
+                {isPlacingOrder ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Placing Order...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <FiCreditCard className="text-lg" />
+                    Place Order
+                  </div>
+                )}
+              </button>
+
+              {/* Secure Checkout Info - Desktop */}
+              {/* {!isMobile && (
+                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <FiLock className="text-green-500 text-xl" />
+                    <div>
+                      <p className="font-medium">Secure Checkout</p>
+                      <p className="text-sm text-gray-500">Your payment is safe and secure</p>
+                    </div>
+                  </div>
+                </div>
+              )} */}
+
+              {/* Delivery Info */}
+              {/* <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <FiClock className="text-lg" />
+                  <span className="text-sm font-medium">Delivery Estimate</span>
+                </div>
+                <p className="text-xs text-gray-600 mt-1">3-5 business days • Free shipping</p>
+              </div> */}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Bottom Bar */}
+      {isMobile && activeStep >= 2 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-2xl p-4 z-50">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <div className="text-sm text-gray-500">Total Amount</div>
+              <div className="text-xl font-bold text-gray-900">₹{totalAmount}</div>
+            </div>
+            <button
+              onClick={handlePlaceOrder}
+              disabled={isPlacingOrder}
+              className={`px-6 py-3 rounded-lg font-bold text-sm min-w-[140px]
+                ${!isPlacingOrder
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white'
+                  : 'bg-gray-200 text-gray-400'
+                }`}
+            >
+              {isPlacingOrder ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Processing...
+                </div>
+              ) : (
+                "Pay Now"
+              )}
+            </button>
+          </div>
+          <div className="text-xs text-center text-gray-500">
+            By placing order, you agree to our Terms & Conditions
+          </div>
+        </div>
+      )}
+
+      {/* Add some animation styles */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.6s ease-out;
+        }
+        .line-clamp-1 {
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+        }
+        .line-clamp-2 {
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+          button, [role="button"] {
+            min-height: 44px; /* Minimum touch target */
+          }
+          
+          input, select, textarea {
+            font-size: 16px; /* Prevents iOS zoom on focus */
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default Checkout;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
