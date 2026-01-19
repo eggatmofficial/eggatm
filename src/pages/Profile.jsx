@@ -889,7 +889,7 @@ const Profile = () => {
         : [];
       
       setOrders(sortedOrders);
-      toast.success("Orders refreshed successfully!");
+      // toast.success("Orders refreshed successfully!");
     } catch (err) {
       console.error(err);
       toast.error("Failed to load orders");
