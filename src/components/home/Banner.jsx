@@ -377,7 +377,7 @@ const Banner = () => {
                 onClick={() => navigate("/products")}
                 className="px-10 md:px-14 py-3 md:py-4 bg-amber-500 rounded-full font-bold text-black"
               >
-                Shop Now
+                Explore Now
               </motion.button>
             </div>
           </div>
