@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title %></title>
+</head>
+<body style="font-family: Arial; background:#f6f6f6; padding:20px;">
+  <div style="max-width:600px; margin:auto; background:#ffffff; padding:20px; border-radius:6px;">
+
+    <h2 style="color:<%= color %>;"><%= title %></h2>
+
+    <p>Hello <strong><%= user.name %></strong>,</p>
+
+    <p><%= message %></p>
+
+    <hr />
+
+    <p><strong>Order ID:</strong> <%= order._id %></p>
+    <p><strong>Status:</strong> <%= order.status %></p>
+    <p><strong>Total:</strong> ₹<%= order.totalAmount %></p>
+
+    <% if (showItems && order.items && order.items.length) { %>
+      <h3>Items</h3>
+      <ul>
+        <% order.items.forEach(item => { %>
+          <li><%= item.variantLabel %> × <%= item.quantity %></li>
+        <% }) %>
+      </ul>
+    <% } %>
+
+    <% if (ctaText && ctaUrl) { %>
+      <p style="margin-top:20px;">
+        <a href="<%= ctaUrl %>"
+           style="padding:10px 16px; background:#1976d2; color:#fff; text-decoration:none; border-radius:4px;">
+          <%= ctaText %>
+        </a>
+      </p>
+    <% } %>
+
+    <p style="margin-top:30px;">
+      Thanks,<br/>
+      <strong>EGG ATM</strong>
+    </p>
+
+  </div>
+</body>
+</html>
