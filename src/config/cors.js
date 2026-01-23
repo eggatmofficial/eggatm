@@ -20,21 +20,27 @@
 
 // module.exports = corsOptions;
 
-
 const env = require("./env");
 
+// read from env
 let allowedOrigins = env.CORS_ORIGIN || "*";
 
+// normalize allowed origins (remove trailing slash)
 if (allowedOrigins !== "*") {
-  allowedOrigins = allowedOrigins.split(",").map(o => o.trim());
+  allowedOrigins = allowedOrigins
+    .split(",")
+    .map(o => o.trim().replace(/\/$/, ""));
 }
 
 module.exports = {
   origin: (origin, callback) => {
+    // allow server-to-server, Postman, mobile apps
     if (!origin) return callback(null, true);
 
+    // allow all (temporary or open API)
     if (allowedOrigins === "*") return callback(null, true);
 
+    // normalize incoming origin
     const normalizedOrigin = origin.replace(/\/$/, "");
 
     if (allowedOrigins.includes(normalizedOrigin)) {
@@ -42,7 +48,7 @@ module.exports = {
     }
 
     console.log("❌ Blocked by CORS:", normalizedOrigin);
-    return callback(null, false);
+    return callback(null, false); // DO NOT throw error
   },
 
   credentials: true,
