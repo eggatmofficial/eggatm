@@ -32,10 +32,10 @@ if (allowedOrigins !== "*") {
 
 module.exports = {
   origin: (origin, callback) => {
-    // allow server-to-server, postman, mobile apps
+    // allow requests without origin (Postman, mobile apps, server-side)
     if (!origin) return callback(null, true);
 
-    // allow all
+    // allow all origins
     if (allowedOrigins === "*") {
       return callback(null, true);
     }
@@ -47,8 +47,9 @@ module.exports = {
       return callback(null, true);
     }
 
-    console.log("Blocked by CORS:", normalizedOrigin);
-    callback(null, false); // IMPORTANT: do not throw error
+    // ❗ DO NOT throw error (causes 500)
+    console.log("❌ Blocked by CORS:", normalizedOrigin);
+    return callback(null, false);
   },
 
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
