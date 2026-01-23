@@ -4,7 +4,7 @@ import { GiEggPod, GiCookingPot } from 'react-icons/gi';
 import { IoTimeOutline, IoLocationOutline, IoFastFoodOutline, IoSparkles } from 'react-icons/io5';
 import { FaEgg, FaFire, FaArrowRight } from 'react-icons/fa';
 import { MdAccessTime } from 'react-icons/md';
-import locationImage from '../assets/imges/Loca.png';
+import locationImage from '../assets/imges/loca.png';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
