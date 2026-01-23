@@ -21,7 +21,6 @@
 // module.exports = corsOptions;
 
 
-
 const env = require("./env");
 
 let allowedOrigins = env.CORS_ORIGIN || "*";
@@ -32,27 +31,21 @@ if (allowedOrigins !== "*") {
 
 module.exports = {
   origin: (origin, callback) => {
-    // allow requests without origin (Postman, mobile apps, server-side)
     if (!origin) return callback(null, true);
 
-    // allow all origins
-    if (allowedOrigins === "*") {
-      return callback(null, true);
-    }
+    if (allowedOrigins === "*") return callback(null, true);
 
-    // normalize origin (remove trailing slash)
     const normalizedOrigin = origin.replace(/\/$/, "");
 
     if (allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
 
-    // ❗ DO NOT throw error (causes 500)
     console.log("❌ Blocked by CORS:", normalizedOrigin);
     return callback(null, false);
   },
 
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
 };

@@ -27,8 +27,6 @@
 
 // module.exports = app;
 
-
-
 const express = require("express");
 const cors = require("cors");
 
@@ -45,12 +43,12 @@ require("./config/env");
 
 const app = express();
 
-/* 🔥 HEALTH CHECK */
+/* health check */
 app.get("/", (req, res) => {
   res.send("EggAtm Backend is running!");
 });
 
-/* webhook (must be before json) */
+/* webhook */
 app.post(
   "/api/payments/webhook",
   express.raw({ type: "application/json" }),
