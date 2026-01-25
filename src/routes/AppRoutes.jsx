@@ -110,6 +110,7 @@ import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import UserLayout from "../components/layout/UserLayout";
 import AdminLayout from "../components/layout/AdminLayout";
 
+
 // User Pages
 const Home = lazy(() => import("../pages/Home"));
 const Products = lazy(() => import("../pages/Products"));
@@ -124,6 +125,8 @@ const Terms = lazy(() => import("../pages/Terms"));
 const ShippingPolicy = lazy(() => import("../pages/ShippingPolicy"));
 const Franchise = lazy(() => import("../pages/Franchise"));
 const NotFound = lazy(() => import("../components/common/NotFound"));
+const PrivacyPolicy = lazy(() => import("../pages/PrivacyPolicy"));
+
 
 // Admin Pages
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
@@ -153,6 +156,7 @@ const AppRoutes = () => {
           <Route path="/terms-and-conditions" element={<Terms />} />
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
           <Route path="/franchise" element={<Franchise />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </Route>
 
         {/* ================= AUTH ================= */}

@@ -101,7 +101,7 @@ const Header = () => {
               </button>
 
               <Link to="/" className="brand-title">
-                EGG<span>!</span>ATM
+                EGG<span>!</span> ATM
               </Link>
             </div>
 

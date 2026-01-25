@@ -86,7 +86,7 @@ const Footer = () => {
   ];
 
   const quickLinks = [
-    { name: "About Us", icon: <FaUser />, link: "/about" },
+    { name: "About Us", icon: <FaUser />, link: "/aboutus" },
     { name: "Terms of Service", icon: <FaFileContract />, link: "/terms-and-conditions" },
     { name: "Privacy Policy", icon: <FaShieldAlt />, link: "/privacy-policy" },
   ];

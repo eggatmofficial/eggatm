@@ -74,7 +74,7 @@ useEffect(() => {
     dispatch(restoreAuth({ token }));
     dispatch(fetchMyProfile());
   }
-}, []);
+}, [dispatch]);
 
   const { isAuthenticated } = useSelector(state => state.auth);
     useEffect(() => {

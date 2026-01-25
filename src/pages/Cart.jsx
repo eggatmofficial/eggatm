@@ -203,7 +203,7 @@ const Cart = () => {
 
   if (!items.length) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/30 via-white to-white flex flex-col items-center justify-center px-4 py-8">
+      <div className=" bg-gradient-to-b from-amber-50/30 via-white to-white flex flex-col items-center justify-center px-4 py-8">
         {/* Mobile Back Button */}
         <div className="w-full max-w-7xl px-4 mb-8 sm:hidden">
           <button
@@ -221,7 +221,7 @@ const Cart = () => {
           transition={{ duration: 0.5, type: "spring" }}
           className="text-center px-4"
         >
-          <div className="relative mb-8">
+          <div className="relative mb-4">
             <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 flex items-center justify-center mx-auto">
               <FiShoppingBag className="text-3xl sm:text-4xl md:text-6xl text-amber-500" />
             </div>
@@ -259,7 +259,7 @@ const Cart = () => {
   const selectedQuantity = calculateSelectedQuantity();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/30 via-white to-white py-4 sm:py-6 md:py-8">
+    <div className="bg-gradient-to-b from-amber-50/30 via-white to-white py-2 sm:py-6 md:py-8">
       {/* Mobile Header with Back Button */}
       {screenSize === 'mobile' && (
         <div className="px-4 mb-4">
@@ -794,7 +794,7 @@ const Cart = () => {
             <div className="flex items-center justify-between mb-2">
               <div>
                 <div className="text-sm text-gray-600">Total ({selectedQuantity} items)</div>
-                <div className="text-xl font-bold text-gray-900">₹{((selectedTotal * 1.18) + (selectedTotal >= 499 ? 0 : 50)).toFixed(2)}</div>
+                <div className="text-xl font-bold text-gray-900">₹{selectedTotal.toFixed(2)}</div>
               </div>
               <button
                 onClick={handleCheckout}
@@ -809,9 +809,6 @@ const Cart = () => {
                 <span>Checkout</span>
                 <FiArrowRight />
               </button>
-            </div>
-            <div className="text-xs text-gray-500 text-center">
-              Inclusive of all taxes • {selectedTotal >= 499 ? 'Free' : '₹50'} delivery
             </div>
           </div>
         </div>

@@ -425,7 +425,7 @@ const About = () => {
               marginBottom: getResponsiveValue('0.75rem', '1rem', '1.5rem'),
               color: 'rgba(255, 255, 255, 0.8)'
             }}>
-              Born from a simple idea in 2025, <strong style={{ color: '#FFD166' }}>Egg! ATM</strong> revolutionized 
+              Born from a simple idea in 2025, <strong style={{ color: '#FFD166' }}>EGG! ATM</strong> revolutionized 
               late-night snacking with our unique approach to egg-based delicacies.
             </p>
             

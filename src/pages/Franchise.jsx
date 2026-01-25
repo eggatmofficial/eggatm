@@ -31,8 +31,7 @@ const Franchise = () => {
     { item: 'Auto Dining Setup', cost: '₹15,000' },
     { item: 'Unjal Setup (Traditional Swing)', cost: '₹19,000' },
     { item: 'Chinese Table Setup', cost: '₹12,000' },
-    { item: 'Soda Machine', cost: '₹1,65,000' },
-    { item: 'Tea & Coffee Vending Machine', cost: '₹1,95,000' },
+    { item: 'Soda Machine', cost: '₹1,75,000' },
     { item: 'Neon Board', cost: '₹6,000' },
     { item: 'CCTV System', cost: '₹20,000 - ₹30,000' },
     { item: 'UPS Power Backup', cost: '₹20,000 - ₹30,000' },
@@ -50,7 +49,7 @@ const Franchise = () => {
     },
     {
       question: "Is there a renewal fee?",
-      answer: "Yes, ₹3,000 every 3 years."
+      answer: "Yes, ₹3,000 every 1 year."
     },
     {
       question: "What support do I get?",
@@ -70,7 +69,7 @@ const Franchise = () => {
     },
     {
       question: "Who handles marketing?",
-      answer: "egg! atm handles social media promotion for you."
+      answer: "EGG! ATM handles social media promotion for you."
     }
   ];
 
@@ -285,10 +284,10 @@ const downloadBrochure = () => {
               </h3>
               <div className="space-y-6">
                 {[
-                  { label: "Brand Name", value: "Egg! atm - ANY TIME MUTTAI" },
+                  { label: "Brand Name", value: "EGG! ATM - ANY TIME MUTTAI" },
                   { label: "Franchise Fee", value: "₹69,000 (one-time)", highlight: true },
                   { label: "Royalty", value: "₹0 (lifetime royalty-free)", highlight: true },
-                  { label: "Renewal Fee", value: "₹3,000 (every 3 years)" },
+                  { label: "Renewal Fee", value: "₹3,000 (every 1 year)" },
                   { label: "Monthly Sales Estimate", value: "₹70,000 - ₹1,00,000" },
                   { label: "Profit Margin", value: "60% - 70%", highlight: true },
                   { label: "Outlet Size", value: "150-250 sq. ft. & above" }
