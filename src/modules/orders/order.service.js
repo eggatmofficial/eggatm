@@ -282,7 +282,7 @@ async updateOrderStatus(orderId, status) {
   order.status = status;
   await order.save();
 
-  await sendOrderStatusEmail(order);
+  // await sendOrderStatusEmail(order);
   return order;
 }
 

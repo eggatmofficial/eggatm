@@ -79,9 +79,9 @@ class PaymentService {
     const order = await orderService.updateOrderStatus(payment.orderId,"PAID" );
 
 
-    await sendOrderStatusEmail(order);
+    // await sendOrderStatusEmail(order);
 
-  console.log(" Payment success email sent to user:", order.userId);
+  // console.log(" Payment success email sent to user:", order.userId);
 
     
 
