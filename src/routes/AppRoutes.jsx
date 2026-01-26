@@ -21,7 +21,7 @@
 // const Contact = lazy(() => import("../pages/Contact"));
 // const Terms = lazy(() => import("../pages/Terms"));
 // const ShippingPolicy = lazy(() => import("../pages/ShippingPolicy"));
-// const Franchise = lazy(() => import("../pages/franchise"));
+// const Franchise = lazy(() => import("../pages/Franchise"));
 // const NotFound = lazy(() => import("../components/common/NotFound"));
 
 // // Admin Components (DO NOT lazy load AdminLayout)
