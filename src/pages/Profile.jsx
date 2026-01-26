@@ -299,6 +299,53 @@ const Profile = () => {
 
   if (!user) return null;
 
+
+const getStatusDescription = (status) => {
+  const descriptions = {
+    CREATED: "Your order has been placed successfully",
+    CONFIRMED: "We've received your order and confirmed it",
+    PROCESSING: "Your order is being prepared for shipment",
+    SHIPPED: "Your order has been dispatched from our warehouse",
+    OUT_FOR_DELIVERY: "Your order is on its way to your location",
+    DELIVERED: "Your order has been successfully delivered",
+    CANCELLED: "Your order has been cancelled",
+  };
+  return descriptions[status] || "Your order is being processed";
+};
+
+const calculateProgressHeight = (status) => {
+  const steps = ['CREATED', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+  const currentIndex = steps.indexOf(status);
+  
+  if (currentIndex === -1) return 0;
+  return ((currentIndex + 1) / steps.length) * 100;
+};
+
+const getEstimatedTime = (createdAt, stepIndex) => {
+  const date = new Date(createdAt);
+  // Add hours based on step index
+  date.setHours(date.getHours() + (stepIndex * 2));
+  
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const getDeliveryEstimate = (status) => {
+  const estimates = {
+    CREATED: "Within 3-5 business days",
+    CONFIRMED: "Within 3-5 business days",
+    PROCESSING: "Within 2-4 business days",
+    SHIPPED: "Within 1-2 business days",
+    OUT_FOR_DELIVERY: "Today or tomorrow",
+    DELIVERED: "Delivered successfully",
+  };
+  return estimates[status] || "Will be updated soon";
+};
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Mobile Header - Simplified without "My Account" text */}
@@ -778,296 +825,309 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* FIXED - RESPONSIVE TRACK ORDER MODAL WITH ANIMATED TIMELINE */}
-      {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 animate-fade-in">
-          <div 
-            ref={modalRef}
-            className="bg-white w-full max-w-2xl h-screen overflow-y-auto"
+  {/* TRACK ORDER MODAL WITH DYNAMIC STATUS */}
+{selectedOrder && (
+  <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 animate-fade-in">
+    <div 
+      ref={modalRef}
+      className="bg-white w-full max-w-2xl h-screen overflow-y-auto"
+    >
+      {/* Modal Header - Fixed at top */}
+      <div className="sticky top-0 bg-white z-20 p-4 border-b border-gray-100 shadow-sm">
+        <div className="flex justify-between items-center">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-bold text-gray-800 truncate">
+              Order #{selectedOrder.orderNumber || selectedOrder._id.slice(-8).toUpperCase()}
+            </h3>
+            <p className="text-gray-600 mt-1 text-sm">
+              Placed on {formatDate(selectedOrder.createdAt)}
+            </p>
+          </div>
+          <button
+            onClick={() => setSelectedOrder(null)}
+            className="ml-4 flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors duration-300"
           >
-            {/* Modal Header - Fixed at top */}
-            <div className="sticky top-0 bg-white z-20 p-4 border-b border-gray-100 shadow-sm">
-              <div className="flex justify-between items-center">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-bold text-gray-800 truncate">
-                    Order #{selectedOrder.orderNumber || selectedOrder._id.slice(-8).toUpperCase()}
-                  </h3>
-                  <p className="text-gray-600 mt-1 text-sm">
-                    Placed on {formatDate(selectedOrder.createdAt)}
+            <FiX className="text-gray-600 text-lg" />
+          </button>
+        </div>
+      </div>
+
+      {/* Modal Content */}
+      <div className="p-4">
+        {/* Current Status Card - DYNAMIC */}
+        {(() => {
+          const statusConfig = getOrderStatus(selectedOrder.status);
+          const StatusIcon = statusConfig.icon;
+          
+          return (
+            <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-base font-semibold text-gray-800">Current Status</span>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {getStatusDescription(selectedOrder.status)}
                   </p>
                 </div>
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="ml-4 flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors duration-300"
-                >
-                  <FiX className="text-gray-600 text-lg" />
-                </button>
+                <span className={`px-3 py-1.5 rounded-full text-sm font-bold ${statusConfig.bg} ${statusConfig.color} flex items-center gap-2`}>
+                  <StatusIcon className="text-base" />
+                  {statusConfig.label}
+                </span>
               </div>
             </div>
+          );
+        })()}
 
-            {/* Modal Content */}
-            <div className="p-4">
-              {/* Current Status Card */}
-              <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-base font-semibold text-gray-800">Current Status</span>
-                    <p className="text-gray-600 text-sm mt-1">
-                      Your order has been delivered
-                    </p>
-                  </div>
-                  <span className="px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-600 flex items-center gap-2">
-                    <FiCheckCircle className="text-base" />
-                    Delivered
-                  </span>
-                </div>
+     {/* DYNAMIC Animated Vertical Timeline */}
+<div className="mb-6">
+  <h4 className="text-base font-semibold text-gray-800 mb-4">Order Tracking</h4>
+  
+  <div className="relative">
+    {/* Vertical Line */}
+    <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200">
+      {/* Animated Progress Line - DYNAMIC based on status */}
+      <div 
+        className="absolute top-0 left-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-green-500 transition-all duration-1000 ease-out"
+        style={{ height: `${calculateProgressHeight(selectedOrder.status)}%` }}
+      >
+        {/* Pulse Animation */}
+        <div className="absolute bottom-0 left-0 w-0.5 h-4 bg-green-400 animate-pulse"></div>
+      </div>
+    </div>
+
+    {/* Timeline Steps - DYNAMIC with different colors */}
+    <div className="space-y-6 ml-8">
+      {getOrderSteps(selectedOrder.status).map((step, index) => {
+        const StepIcon = step.icon;
+        const isCurrentStep = step.active;
+        const isCompleted = step.completed;
+        const isUpcoming = !isCompleted && !isCurrentStep;
+        
+        // Define color for each step type
+        const stepColors = {
+          CREATED: {
+            bg: 'from-blue-500 to-blue-600',
+            border: 'border-blue-500',
+            ring: 'ring-blue-100',
+            bgLight: 'bg-blue-50',
+            text: 'text-blue-600'
+          },
+          CONFIRMED: {
+            bg: 'from-purple-500 to-purple-600',
+            border: 'border-purple-500',
+            ring: 'ring-purple-100',
+            bgLight: 'bg-purple-50',
+            text: 'text-purple-600'
+          },
+          PROCESSING: {
+            bg: 'from-yellow-500 to-yellow-600',
+            border: 'border-yellow-500',
+            ring: 'ring-yellow-100',
+            bgLight: 'bg-yellow-50',
+            text: 'text-yellow-600'
+          },
+          SHIPPED: {
+            bg: 'from-orange-500 to-orange-600',
+            border: 'border-orange-500',
+            ring: 'ring-orange-100',
+            bgLight: 'bg-orange-50',
+            text: 'text-orange-600'
+          },
+          OUT_FOR_DELIVERY: {
+            bg: 'from-pink-500 to-pink-600',
+            border: 'border-pink-500',
+            ring: 'ring-pink-100',
+            bgLight: 'bg-pink-50',
+            text: 'text-pink-600'
+          },
+          DELIVERED: {
+            bg: 'from-green-500 to-green-600',
+            border: 'border-green-500',
+            ring: 'ring-green-100',
+            bgLight: 'bg-green-50',
+            text: 'text-green-600'
+          }
+        };
+        
+        const colors = stepColors[step.key] || stepColors.CREATED;
+        
+        return (
+          <div key={step.key} className="relative group">
+            <div className={`absolute -left-10 top-1/2 transform -translate-y-1/2 ${
+              isCompleted ? 'animate-pulse' : ''
+            }`}>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white shadow-lg ring-4 ${colors.ring} ${
+                isCompleted 
+                  ? `bg-gradient-to-r ${colors.bg}` 
+                  : isCurrentStep
+                  ? `bg-gradient-to-r ${colors.bg}`
+                  : 'bg-gray-300 ring-gray-100'
+              }`}>
+                <StepIcon className="text-xs" />
               </div>
-
-              {/* Animated Vertical Timeline */}
-              <div className="mb-6">
-                <h4 className="text-base font-semibold text-gray-800 mb-4">Order Tracking</h4>
-                
-                <div className="relative">
-                  {/* Vertical Line */}
-                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200">
-                    {/* Animated Progress Line */}
-                    <div 
-                      className="absolute top-0 left-0 w-0.5 bg-gradient-to-b from-green-400 to-emerald-500 transition-all duration-1000 ease-out"
-                      style={{ height: '100%' }}
-                    >
-                      {/* Pulse Animation */}
-                      <div className="absolute bottom-0 left-0 w-0.5 h-4 bg-green-400 animate-pulse"></div>
-                    </div>
-                  </div>
-
-                  {/* Timeline Steps */}
-                  <div className="space-y-6 ml-8">
-                    {/* Step 1: Order Placed */}
-                    <div className="relative group">
-                      <div className="absolute -left-10 top-1/2 transform -translate-y-1/2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg ring-4 ring-blue-100">
-                          <MdShoppingBag className="text-xs" />
-                        </div>
-                      </div>
-                      <div className="bg-white p-4 rounded-xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h5 className="font-semibold text-gray-800 text-sm">Order Placed</h5>
-                            <p className="text-gray-600 text-xs mt-1">Order received and confirmed</p>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <FiClock className="text-gray-400" />
-                            <span>{formatDateShort(selectedOrder.createdAt)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Step 2: Processing */}
-                    <div className="relative group">
-                      <div className="absolute -left-10 top-1/2 transform -translate-y-1/2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white shadow-lg ring-4 ring-purple-100">
-                          <FiPackage className="text-xs" />
-                        </div>
-                      </div>
-                      <div className="bg-white p-4 rounded-xl border-l-4 border-purple-500 shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h5 className="font-semibold text-gray-800 text-sm">Processing</h5>
-                            <p className="text-gray-600 text-xs mt-1">Order is being prepared</p>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <FiClock className="text-gray-400" />
-                            <span>{formatDateShort(new Date(new Date(selectedOrder.createdAt).getTime() + 3600000))}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Step 3: Shipped */}
-                    <div className="relative group">
-                      <div className="absolute -left-10 top-1/2 transform -translate-y-1/2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center text-white shadow-lg ring-4 ring-orange-100">
-                          <MdLocalShipping className="text-xs" />
-                        </div>
-                      </div>
-                      <div className="bg-white p-4 rounded-xl border-l-4 border-orange-500 shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h5 className="font-semibold text-gray-800 text-sm">Shipped</h5>
-                            <p className="text-gray-600 text-xs mt-1">Order dispatched for delivery</p>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <FiClock className="text-gray-400" />
-                            <span>{formatDateShort(new Date(new Date(selectedOrder.createdAt).getTime() + 7200000))}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Step 4: Out for Delivery */}
-                    <div className="relative group">
-                      <div className="absolute -left-10 top-1/2 transform -translate-y-1/2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-pink-600 flex items-center justify-center text-white shadow-lg ring-4 ring-pink-100 animate-pulse">
-                          <FaShippingFast className="text-xs" />
-                        </div>
-                      </div>
-                      <div className="bg-white p-4 rounded-xl border-l-4 border-pink-500 shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h5 className="font-semibold text-gray-800 text-sm">Out for Delivery</h5>
-                            <p className="text-gray-600 text-xs mt-1">On the way to your location</p>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <FiClock className="text-gray-400" />
-                            <span>{formatDateShort(new Date(new Date(selectedOrder.createdAt).getTime() + 10800000))}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Step 5: Delivered - Current Active Step with Animation */}
-                    <div className="relative group">
-                      <div className="absolute -left-10 top-1/2 transform -translate-y-1/2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center text-white shadow-lg ring-4 ring-green-100 animate-pulse">
-                          <FiCheckCircle className="text-xs" />
-                        </div>
-                        {/* Animated Ring */}
-                        <div className="absolute inset-0 w-6 h-6 rounded-full border-2 border-green-400 animate-ping opacity-75"></div>
-                      </div>
-                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border-l-4 border-green-500 shadow-md transform scale-105 transition-all duration-300">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h5 className="font-semibold text-gray-800 text-sm">Delivered</h5>
-                              <span className="px-2 py-0.5 bg-green-500 text-white text-xs rounded-full animate-pulse">
-                                CURRENT
-                              </span>
-                            </div>
-                            <p className="text-gray-600 text-xs mt-1">Order successfully delivered</p>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <FiClock className="text-gray-400" />
-                            <span>{formatDateShort(new Date(new Date(selectedOrder.createdAt).getTime() + 14400000))}</span>
-                          </div>
-                        </div>
-                        {/* Success Message */}
-                        <div className="mt-3 p-2 bg-green-100 rounded-lg">
-                          <p className="text-green-700 text-xs font-medium flex items-center gap-1">
-                            <FiCheckCircle className="text-green-600" />
-                            Your order has been successfully delivered to your address
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment & Delivery Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h4 className="text-base font-semibold text-gray-800 mb-3">Payment Details</h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">Method</span>
-                      <span className="font-medium text-sm">Credit/Debit Card</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">Status</span>
-                      <span className="font-medium text-green-600 text-sm">Paid</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">Amount</span>
-                      <span className="font-medium text-sm">₹{selectedOrder.totalAmount}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h4 className="text-base font-semibold text-gray-800 mb-3">Delivery Details</h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-start">
-                      <span className="text-gray-600 text-sm">Address</span>
-                      <span className="font-medium text-sm text-right">
-                        {userAddress ? (
-                          <>
-                            {userAddress.line1}<br />
-                            {userAddress.city}, {userAddress.pincode}
-                          </>
-                        ) : 'namakkal'}
+              {/* Animated Ring for current step */}
+              {isCurrentStep && (
+                <div className="absolute inset-0 w-6 h-6 rounded-full border-2 border-green-400 animate-ping opacity-75"></div>
+              )}
+            </div>
+            
+            <div className={`p-4 rounded-xl border-l-4 shadow-sm hover:shadow-md transition-shadow duration-300 ${
+              isCompleted
+                ? `${colors.bgLight} ${colors.border}`
+                : isCurrentStep
+                ? `${colors.bgLight} ${colors.border}`
+                : 'bg-white border-gray-300'
+            }`}>
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h5 className={`font-semibold text-sm ${
+                      isCompleted || isCurrentStep ? colors.text : 'text-gray-800'
+                    }`}>
+                      {step.label}
+                    </h5>
+                    {isCurrentStep && (
+                      <span className={`px-2 py-0.5 ${colors.text} bg-white text-xs rounded-full animate-pulse border ${colors.border}`}>
+                        CURRENT
                       </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">Contact</span>
-                      <span className="font-medium text-sm">{user.mobile || '6379203588'}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">Delivery Time</span>
-                      <span className="font-medium text-sm">Within 24 hours</span>
-                    </div>
+                    )}
+                    {step.key === 'DELIVERED' && isCompleted && (
+                      <span className="px-2 py-0.5 bg-green-500 text-white text-xs rounded-full animate-pulse">
+                        DELIVERED
+                      </span>
+                    )}
                   </div>
+                  <p className="text-gray-600 text-xs mt-1">
+                    {step.description}
+                  </p>
                 </div>
               </div>
-
-              {/* Order Items Summary */}
-              <div className="mb-6">
-                <h4 className="text-base font-semibold text-gray-800 mb-4">Order Summary</h4>
-                <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
-                  {selectedOrder.items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-300">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-800 text-sm truncate">
-                          {item.productId?.name || "Product"}
-                        </p>
-                        <p className="text-gray-600 text-xs mt-1">
-                          Qty: {item.quantity} × ₹{item.price}
-                        </p>
-                      </div>
-                      <p className="font-bold text-gray-800 text-sm ml-3 whitespace-nowrap">
-                        ₹{item.quantity * item.price}
-                      </p>
-                    </div>
-                  ))}
-                  
-                  <div className="pt-4 border-t border-gray-200">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">Subtotal</span>
-                        <span className="font-medium text-sm">₹{selectedOrder.totalAmount}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">Shipping</span>
-                        <span className="font-medium text-green-600 text-sm">FREE</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">Tax</span>
-                        <span className="font-medium text-sm">₹0</span>
-                      </div>
-                      <div className="pt-2 border-t border-gray-300">
-                        <div className="flex justify-between items-center">
-                          <span className="font-semibold text-gray-800 text-base">Total Amount</span>
-                          <span className="text-xl font-bold text-gray-800">₹{selectedOrder.totalAmount}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              
+              {/* Success Message for delivered orders */}
+              {step.key === 'DELIVERED' && isCompleted && (
+                <div className="mt-3 p-2 bg-green-100 rounded-lg">
+                  <p className="text-green-700 text-xs font-medium flex items-center gap-1">
+                    <FiCheckCircle className="text-green-600" />
+                    Your order has been successfully delivered to your address
+                  </p>
                 </div>
-              </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
 
-              {/* close Button */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="flex-1 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all duration-300"
-                >
-                  Close
-                </button>
+        {/* Payment & Delivery Details */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div className="bg-gray-50 rounded-xl p-4">
+            <h4 className="text-base font-semibold text-gray-800 mb-3">Payment Details</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 text-sm">Method</span>
+                <span className="font-medium text-sm">
+                  {selectedOrder.paymentMethod || "Credit/Debit Card"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 text-sm">Status</span>
+                <span className={`font-medium text-sm ${
+                  selectedOrder.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
+                }`}>
+                  {selectedOrder.paymentStatus?.toUpperCase() || 'PAID'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 text-sm">Amount</span>
+                <span className="font-medium text-sm">₹{selectedOrder.totalAmount}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-4">
+            <h4 className="text-base font-semibold text-gray-800 mb-3">Delivery Details</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-start">
+                <span className="text-gray-600 text-sm">Address</span>
+                <span className="font-medium text-sm text-right">
+                  {userAddress ? (
+                    <>
+                      {userAddress.line1}<br />
+                      {userAddress.city}, {userAddress.pincode}
+                    </>
+                  ) : 'Address not specified'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 text-sm">Contact</span>
+                <span className="font-medium text-sm">{user.mobile || userAddress?.phone || 'Not provided'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 text-sm">Delivery Time</span>
+                <span className="font-medium text-sm">
+                  {getDeliveryEstimate(selectedOrder.status)}
+                </span>
               </div>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Order Items Summary */}
+        <div className="mb-6">
+          <h4 className="text-base font-semibold text-gray-800 mb-4">Order Summary</h4>
+          <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
+            {selectedOrder.items.map((item, index) => (
+              <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-300">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-800 text-sm truncate">
+                    {item.productId?.name || "Product"}
+                  </p>
+                  <p className="text-gray-600 text-xs mt-1">
+                    Qty: {item.quantity} × ₹{item.price}
+                  </p>
+                </div>
+                <p className="font-bold text-gray-800 text-sm ml-3 whitespace-nowrap">
+                  ₹{item.quantity * item.price}
+                </p>
+              </div>
+            ))}
+            
+            <div className="pt-4 border-t border-gray-200">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 text-sm">Subtotal</span>
+                  <span className="font-medium text-sm">₹{selectedOrder.totalAmount}</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 text-sm">Tax</span>
+                  <span className="font-medium text-sm">₹0</span>
+                </div>
+                <div className="pt-2 border-t border-gray-300">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-800 text-base">Total Amount</span>
+                    <span className="text-xl font-bold text-gray-800">₹{selectedOrder.totalAmount}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Close Button */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => setSelectedOrder(null)}
+            className="flex-1 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all duration-300"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

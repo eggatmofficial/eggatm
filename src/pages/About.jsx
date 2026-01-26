@@ -4,7 +4,7 @@ import { GiEggPod, GiCookingPot } from 'react-icons/gi';
 import { IoTimeOutline, IoLocationOutline, IoFastFoodOutline, IoSparkles } from 'react-icons/io5';
 import { FaEgg, FaFire, FaArrowRight } from 'react-icons/fa';
 import { MdAccessTime } from 'react-icons/md';
-import locationImage from '../assets/imges/loca.png';
+import locationImage from '../assets/imges/about.png';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -642,7 +642,8 @@ const About = () => {
             )}
             
             {[
-              { year: "2024", event: "First Egg! ATM Launched", icon: <FaEgg /> },
+              { year: "2023", event: "Conceptualization & R&D", icon: <GiCookingPot /> },
+              { year: "2024", event: "First EGG! ATM Launched", icon: <FaEgg /> },
               { year: "2025", event: "10 Locations Nationwide", icon: <IoFastFoodOutline /> },
               { year: "Present", event: "Culinary Innovation Hub", icon: <IoSparkles /> }
             ].map((item, index) => (
