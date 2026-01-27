@@ -24,7 +24,7 @@ const banners = [
     title: "MUTTA MITTAI",
     subtitle: "Our Signature Egg Sweet",
     desc: "Fresh • Hot • Famous",
-    buttonText: "Shop Now",
+    buttonText: "Taste the Tradition",
     buttonLink: "/products",
     animationStyle: "heroSmash"
   },
@@ -34,7 +34,7 @@ const banners = [
     title: "Egg Street Foods",
     subtitle: "Everyone Loves",
     desc: "Egg Chilli • Lollipop • Fried Rice",
-    buttonText: "View Menu",
+    buttonText: "Sweet with a Twist",
     buttonLink: "/products",
     animationStyle: "comicPop"
   },
@@ -44,17 +44,17 @@ const banners = [
     title: "EGG! ATM Menu",
     subtitle: "All Your Favourite Egg Dishes",
     desc: "Bread Omelette • Egg Chilli • Egg Cutlet • Mini Fried Rice",
-    buttonText: "Explore All",
+    buttonText: "Sweet Journey Starts Here",
     buttonLink: "/products",
     animationStyle: "bounceFlip"
   },
   {
     desktopImage: banner4,
     mobileImage: mBanner4,
-    title: "For Real Egg Lovers",
+    title: "Real Egg Lovers",
     subtitle: "Spicy • Juicy • Full Flavour",
     desc: "Kaara Muttai • Egg Masala Fry • Egg Mixture",
-    buttonText: "Try Today",
+    buttonText: "One Bite Magic",
     buttonLink: "/products",
     animationStyle: "spinZoom"
   },
@@ -64,7 +64,7 @@ const banners = [
     title: "EGG! ATM Specials",
     subtitle: "Hot • Fresh • Made in Front of You",
     desc: "Kaara Muttai • Egg Masala Fry • Egg Paniyaram",
-    buttonText: "Order Specials",
+    buttonText: "Crack Open Happiness",
     buttonLink: "/products",
     animationStyle: "cartoonNetwork"
   },
