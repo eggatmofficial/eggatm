@@ -257,7 +257,62 @@ const normalizeId = (id) => {
 
 class CartService {
   // ➕ ADD TO CART
-  async addToCart(userId, data) {
+  // async addToCart(userId, data) {
+  //   const { productId, variantLabel, quantity } = data;
+
+  //   const product = await Product.findOne({ _id: productId, isActive: true });
+  //   if (!product) throw new ApiError("Product not found", 404);
+
+  //   const variant = product.variants.find(v => v.label === variantLabel);
+  //   if (!variant) throw new ApiError("Variant not found", 404);
+
+  //   if (variant.stock < quantity)
+  //     throw new ApiError("Insufficient stock", 400);
+
+  //   const finalPrice = getFinalPrice(product, variant);
+
+  //   let cart = await cartRepo.findByUserId(userId);
+
+  //   if (!cart) {
+  //     cart = await cartRepo.create({
+  //       userId,
+  //       items: [{
+  //         productId,
+  //         variantLabel,
+  //         price: finalPrice,
+  //         originalPrice: variant.price,
+  //         quantity,
+  //         totalPrice: finalPrice * quantity,
+  //       }],
+  //     });
+  //     return cart;
+  //   }
+
+  //   const existingItem = cart.items.find(
+  //     (i) =>
+  //       normalizeId(i.productId) === productId.toString() &&
+  //       i.variantLabel === variantLabel
+  //   );
+
+  //   if (existingItem) {
+  //     existingItem.price = finalPrice;
+  //     existingItem.quantity += quantity;
+  //     existingItem.totalPrice = existingItem.price * existingItem.quantity;
+  //   } else {
+  //     cart.items.push({
+  //       productId,
+  //       variantLabel,
+  //       price: finalPrice,
+  //       originalPrice: variant.price,
+  //       quantity,
+  //       totalPrice: finalPrice * quantity,
+  //     });
+  //   }
+
+  //   await cart.save();
+  //   return cartRepo.findByUserId(userId);
+  // }
+    async addToCart(userId, data) {
     const { productId, variantLabel, quantity } = data;
 
     const product = await Product.findOne({ _id: productId, isActive: true });
@@ -271,6 +326,10 @@ class CartService {
 
     const finalPrice = getFinalPrice(product, variant);
 
+    const itemWeight = variant.unit === "kg"
+      ? variant.weight * 1000
+      : variant.weight;
+
     let cart = await cartRepo.findByUserId(userId);
 
     if (!cart) {
@@ -283,6 +342,7 @@ class CartService {
           originalPrice: variant.price,
           quantity,
           totalPrice: finalPrice * quantity,
+          weight: itemWeight,
         }],
       });
       return cart;
@@ -298,6 +358,9 @@ class CartService {
       existingItem.price = finalPrice;
       existingItem.quantity += quantity;
       existingItem.totalPrice = existingItem.price * existingItem.quantity;
+
+       existingItem.weight = itemWeight;
+
     } else {
       cart.items.push({
         productId,
@@ -306,8 +369,17 @@ class CartService {
         originalPrice: variant.price,
         quantity,
         totalPrice: finalPrice * quantity,
+         weight: itemWeight,
+
       });
     }
+
+    console.log("🧱 CART ITEM SAVED", {
+  variantLabel,
+  itemWeight,
+  quantity
+});
+
 
     await cart.save();
     return cartRepo.findByUserId(userId);
@@ -318,6 +390,8 @@ class CartService {
     let cart = await cartRepo.findByUserId(userId);
 
     if (!cart) return { userId, items: [] };
+
+    console.log("🛒 CART FETCHED ITEMS", cart.items);
 
     cart.items = cart.items.filter(
       (i) => i.productId && i.productId.images?.length > 0

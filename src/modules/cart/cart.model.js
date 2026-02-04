@@ -24,6 +24,10 @@ const cartItemSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+      weight:{
+      type: Number,
+      required:true
+    }
   },
   { _id: false }
 );

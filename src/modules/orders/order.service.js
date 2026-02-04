@@ -1,25 +1,344 @@
+// const ApiError = require("../utils/ApiError");
+// const Product = require("../products/product.model");
+// const cartRepo = require("../cart/cart.repository");
+// const orderRepo = require("./order.repository");
+// const sendOrderStatusEmail = require("../utils/sendOrderStatusEmail");
+// const getFinalPrice = require("../utils/cartHelper");
+
+
+// class OrderService {
+//   // 🛒 CART → ORDER
+// async createFromCart(userId, data) {
+//   const { items, address } = data;
+
+//   if (!items || items.length === 0) {
+//     throw new ApiError("No items selected", 400);
+//   }
+
+//   const order = await this._createOrder(
+//     userId,
+//     items,
+//     address,
+//     "CART"
+//   );
+
+//   // ✅ REMOVE ONLY PURCHASED ITEMS
+//   await cartRepo.removeItems(userId, items);
+
+//   return order;
+// }
+
+
+//   // ⚡ BUY NOW → ORDER
+//   async createFromBuyNow(userId, data) {
+//     const items = [
+//       {
+//         productId: data.productId,
+//         variantLabel: data.variantLabel,
+//         quantity: data.quantity,
+//       },
+//     ];
+
+//     return this._createOrder(userId, items, data.address, "BUY_NOW");
+//   }
+
+//   // 🔥 COMMON ORDER CREATION
+//   // async _createOrder(userId, items, address, source) {
+//   //   let totalAmount = 0;
+//   //   const orderItems = [];
+
+//   //   for (const item of items) {
+//   //     const product = await Product.findById(item.productId);
+
+//   //     if (!product || !product.isActive) {
+//   //       throw new ApiError("Product unavailable", 400);
+//   //     }
+
+//   //     const variant = product.variants.find(
+//   //       (v) => v.label === item.variantLabel
+//   //     );
+
+//   //     if (!variant || variant.stock < item.quantity) {
+//   //       throw new ApiError("Insufficient stock", 400);
+//   //     }
+
+//   //     const subtotal = variant.price * item.quantity;
+//   //     totalAmount += subtotal;
+
+//   //     orderItems.push({
+//   //       productId: item.productId,
+//   //       variantId: variant._id,   
+//   //       variantLabel: item.variantLabel,
+//   //       price: variant.price,
+//   //       quantity: item.quantity,
+//   //       subtotal,
+//   //     });
+//   //   }
+
+//   //     const order = await orderRepo.create({
+//   //     userId,
+//   //     items: orderItems,
+//   //     totalAmount,
+//   //     address,
+//   //     source,
+//   //   });
+
+
+//   //   // await sendOrderStatusEmail(order);
+
+//   //   return order;
+
+//   // }
+
+//   async _createOrder(userId, items, address, source) {
+//   let totalAmount = 0;
+//   const orderItems = [];
+
+//   for (const item of items) {
+//     if (!item.quantity || item.quantity <= 0) {
+//       throw new ApiError("Invalid quantity", 400);
+//     }
+
+//     const product = await Product.findById(item.productId);
+//     if (!product || !product.isActive) {
+//       throw new ApiError("Product unavailable", 400);
+//     }
+
+//     const variant = product.variants.find(
+//       (v) => v.label === item.variantLabel
+//     );
+//     if (!variant) {
+//       throw new ApiError("Variant not found", 404);
+//     }
+
+//     if (variant.stock < item.quantity) {
+//       throw new ApiError("Insufficient stock", 400);
+//     }
+
+//     // ✅ ALWAYS RECALCULATE PRICE IN BACKEND
+//     const finalPrice = getFinalPrice(product, variant);
+
+//     if (typeof finalPrice !== "number" || isNaN(finalPrice)) {
+//       throw new ApiError("Price calculation failed", 500);
+//     }
+
+//     const subtotal = finalPrice * item.quantity;
+//     totalAmount += subtotal;
+
+//     orderItems.push({
+//       productId: item.productId,
+//       variantId: variant._id,
+//       variantLabel: item.variantLabel,
+//       price: finalPrice, // ✅ discounted price
+//       quantity: item.quantity,
+//       subtotal,
+//     });
+//   }
+
+//   return orderRepo.create({
+//     userId,
+//     items: orderItems,
+//     totalAmount,
+//     address,
+//     source,
+//     status: "CREATED",
+//   });
+// }
+
+
+
+
+//   async getMyOrders(userId) {
+//     return orderRepo.findByUserId(userId);
+//   }
+
+
+//   async getMyOrderById(orderId, userId) {
+//     const order = await orderRepo.findUserOrderById(orderId, userId);
+
+//     if (!order) {
+//       throw new ApiError("Order not found", 404);
+//     }
+
+//     return order;
+//   }
+
+
+
+//   async getAllOrders() {
+//     return orderRepo.findAll();
+//   }
+
+
+
+//   async getOrderById(orderId) {
+//     const order = await orderRepo.findByIdOne(orderId);
+//     if (!order) throw new ApiError("Order not found", 404);
+//     return order;
+//   }
+
+
+// //  async updateOrderStatus(orderId, status) {
+// //   const allowedStatus = ["PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
+// //   if (!allowedStatus.includes(status)) {
+// //     throw new ApiError("Invalid order status", 400);
+// //   }
+
+// //   // 1️⃣ FETCH ORDER FIRST
+// //   const order = await orderRepo.findById(orderId);
+// //   if (!order) throw new ApiError("Order not found", 404);
+// // console.log("order",order);
+
+
+  
+// //     console.log("🔁 ORDER STATUS UPDATE", {
+// //       orderId,
+// //       prevStatus: order.status,
+// //        newStatus: status,
+// //     });
+
+// //      if (order.status === "PAID" && status === "PAID") {
+// //       return order;
+// //     }
+
+// //   // 2️⃣ UPDATE STOCK ONLY ON TRANSITION → PAID
+// //   if (order.status !== "PAID" && order.status === "PAID") {
+// //     for (const item of order.items) {
+// //       console.log("📦 REDUCING STOCK", item);
+// //       const result = await Product.updateOne(
+// //         {
+// //           _id: item.productId,
+// //           // "variants._id": item.variantId,
+// //           "variants.label": item.variantLabel,
+// //           "variants.stock": { $gte: item.quantity },
+// //         },
+// //         {
+// //           $inc: { "variants.$.stock": -item.quantity },
+// //         }
+// //       );
+
+// //       // 🚨 SAFETY CHECK
+// //       if (result.modifiedCount === 0) {
+// //         throw new ApiError("Stock update failed", 500);
+// //       }
+// //     }
+// //   }
+
+// //   // 3️⃣ UPDATE ORDER STATUS
+// //   order.status = status;
+// //   await order.save();
+
+// //   await sendOrderStatusEmail(order);
+
+// //   return order;
+// // }
+
+
+// async updateOrderStatus(orderId, status) {
+//   const allowedStatus = ["PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
+//   if (!allowedStatus.includes(status)) {
+//     throw new ApiError("Invalid order status", 400);
+//   }
+
+//   // 1️⃣ FETCH ORDER
+//   const order = await orderRepo.findById(orderId);
+//   if (!order) throw new ApiError("Order not found", 404);
+
+//   console.log("🔁 ORDER STATUS UPDATE", {
+//     orderId,
+//     prevStatus: order.status,
+//     newStatus: status,
+//   });
+
+//   // 🔒 Prevent double deduction
+//   if (order.status === "PAID" && status === "PAID") {
+//     return order;
+//   }
+
+//   // 2️⃣ REDUCE STOCK ONLY WHEN MOVING TO PAID
+//   if (order.status !== "PAID" && status === "PAID") {
+//     for (const item of order.items) {
+//       console.log("📦 REDUCING STOCK", item);
+
+//       const result = await Product.updateOne(
+//         {
+//           _id: item.productId,
+//           "variants.label": item.variantLabel,
+//         },
+//         {
+//           $inc: { "variants.$.stock": -Number(item.quantity) },
+//         }
+//       );
+
+//       console.log("🧮 STOCK UPDATE RESULT", result);
+
+//       if (result.modifiedCount === 0) {
+//         throw new ApiError("Stock update failed", 500);
+//       }
+//     }
+//   }
+
+//   // 3️⃣ UPDATE ORDER STATUS
+//   order.status = status;
+//   await order.save();
+
+//   // await sendOrderStatusEmail(order);
+//   return order;
+// }
+
+
+// }
+
+// module.exports = new OrderService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const ApiError = require("../utils/ApiError");
 const Product = require("../products/product.model");
 const cartRepo = require("../cart/cart.repository");
 const orderRepo = require("./order.repository");
 const sendOrderStatusEmail = require("../utils/sendOrderStatusEmail");
 const getFinalPrice = require("../utils/cartHelper");
+const { calculateShippingCharge } = require("../utils/shippingHelper");
+
 
 
 class OrderService {
   // 🛒 CART → ORDER
 async createFromCart(userId, data) {
-  const { items, address } = data;
+  const { items, address ,shippingMethod} = data;
 
   if (!items || items.length === 0) {
     throw new ApiError("No items selected", 400);
+  }
+
+    if (!shippingMethod) {
+    throw new ApiError("Shipping method is required", 400);
   }
 
   const order = await this._createOrder(
     userId,
     items,
     address,
-    "CART"
+    "CART",
+     shippingMethod
   );
 
   // ✅ REMOVE ONLY PURCHASED ITEMS
@@ -30,17 +349,49 @@ async createFromCart(userId, data) {
 
 
   // ⚡ BUY NOW → ORDER
-  async createFromBuyNow(userId, data) {
-    const items = [
-      {
-        productId: data.productId,
-        variantLabel: data.variantLabel,
-        quantity: data.quantity,
-      },
-    ];
+  // async createFromBuyNow(userId, data) {
+    
+  //   const items = [
+  //     {
+  //       productId: data.productId,
+  //       variantLabel: data.variantLabel,
+  //       quantity: data.quantity,
+  //     },
+  //   ];
 
-    return this._createOrder(userId, items, data.address, "BUY_NOW");
+  //   return this._createOrder(userId, items, data.address, "BUY_NOW");
+  // }
+
+
+  async createFromBuyNow(userId, data) {
+  const {
+    productId,
+    variantLabel,
+    quantity,
+    address,
+    shippingMethod
+  } = data;
+
+  if (!shippingMethod) {
+    throw new ApiError("Shipping method is required", 400);
   }
+
+  const items = [
+    {
+      productId,
+      variantLabel,
+      quantity,
+    },
+  ];
+
+  return this._createOrder(
+    userId,
+    items,
+    address,
+    "BUY_NOW",
+    shippingMethod
+  );
+}
 
   // 🔥 COMMON ORDER CREATION
   // async _createOrder(userId, items, address, source) {
@@ -90,8 +441,74 @@ async createFromCart(userId, data) {
 
   // }
 
-  async _createOrder(userId, items, address, source) {
+//   async _createOrder(userId, items, address, source, shippingMethod = "COURIER") {
+//   let totalAmount = 0;
+//   let totalWeight = 0;
+//   const orderItems = [];
+
+//   for (const item of items) {
+//     if (!item.quantity || item.quantity <= 0) {
+//       throw new ApiError("Invalid quantity", 400);
+//     }
+
+//     const product = await Product.findById(item.productId);
+//     if (!product || !product.isActive) {
+//       throw new ApiError("Product unavailable", 400);
+//     }
+
+//     const variant = product.variants.find(
+//       (v) => v.label === item.variantLabel
+//     );
+//     if (!variant) {
+//       throw new ApiError("Variant not found", 404);
+//     }
+
+//     if (variant.stock < item.quantity) {
+//       throw new ApiError("Insufficient stock", 400);
+//     }
+
+//     // ✅ ALWAYS RECALCULATE PRICE IN BACKEND
+//     const finalPrice = getFinalPrice(product, variant);
+
+//     if (typeof finalPrice !== "number" || isNaN(finalPrice)) {
+//       throw new ApiError("Price calculation failed", 500);
+//     }
+
+//     const subtotal = finalPrice * item.quantity;
+//     totalAmount += subtotal;
+
+//     // ✅ WEIGHT CALCULATION
+//      const weight = variant.unit === "kg" ? variant.weight * 1000 : variant.weight;
+//     totalWeight += weight * item.quantity;
+
+//     orderItems.push({
+//       productId: item.productId,
+//       variantId: variant._id,
+//       variantLabel: item.variantLabel,
+//       price: finalPrice, // ✅ discounted price
+//       quantity: item.quantity,
+//       subtotal,
+//     });
+//   }
+
+
+//   return orderRepo.create({
+//     userId,
+//     items: orderItems,
+//     totalAmount,
+//     address,
+//     source,
+//     status: "CREATED",
+//     shipping: {
+//       method: shippingMethod,
+//       charge: shippingCharge,
+//       totalWeight
+//     }
+//   });
+// }
+async _createOrder(userId, items, address, source, shippingMethod) {
   let totalAmount = 0;
+  let totalWeight = 0;
   const orderItems = [];
 
   for (const item of items) {
@@ -107,43 +524,56 @@ async createFromCart(userId, data) {
     const variant = product.variants.find(
       (v) => v.label === item.variantLabel
     );
-    if (!variant) {
-      throw new ApiError("Variant not found", 404);
-    }
 
-    if (variant.stock < item.quantity) {
+    if (!variant || variant.stock < item.quantity) {
       throw new ApiError("Insufficient stock", 400);
     }
 
-    // ✅ ALWAYS RECALCULATE PRICE IN BACKEND
     const finalPrice = getFinalPrice(product, variant);
-
-    if (typeof finalPrice !== "number" || isNaN(finalPrice)) {
-      throw new ApiError("Price calculation failed", 500);
-    }
-
     const subtotal = finalPrice * item.quantity;
     totalAmount += subtotal;
+
+    const weightInGrams =
+      variant.unit === "kg"
+        ? variant.weight * 1000
+        : variant.weight;
+
+    totalWeight += weightInGrams * item.quantity;
 
     orderItems.push({
       productId: item.productId,
       variantId: variant._id,
       variantLabel: item.variantLabel,
-      price: finalPrice, // ✅ discounted price
+      price: finalPrice,
       quantity: item.quantity,
       subtotal,
     });
   }
 
+  // 🔥 CALCULATE SHIPPING CHARGE
+  const shippingCharge = await calculateShippingCharge(
+    shippingMethod,
+    totalWeight
+  );
+
   return orderRepo.create({
     userId,
     items: orderItems,
-    totalAmount,
+    totalAmount: totalAmount + shippingCharge,
     address,
     source,
     status: "CREATED",
+    shipping: {
+      method: shippingMethod,
+      charge: shippingCharge,
+      totalWeight,
+
+      ...(shippingMethod === "TRANSPORT" && { bus: {} }),
+      ...(shippingMethod === "COURIER" && { courier: {} })
+    },
   });
 }
+
 
 
 
@@ -178,46 +608,45 @@ async createFromCart(userId, data) {
   }
 
 
-//  async updateOrderStatus(orderId, status) {
+
+// async updateOrderStatus(orderId, status) {
 //   const allowedStatus = ["PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
 //   if (!allowedStatus.includes(status)) {
 //     throw new ApiError("Invalid order status", 400);
 //   }
 
-//   // 1️⃣ FETCH ORDER FIRST
+//   // 1️⃣ FETCH ORDER
 //   const order = await orderRepo.findById(orderId);
 //   if (!order) throw new ApiError("Order not found", 404);
-// console.log("order",order);
 
+//   console.log("🔁 ORDER STATUS UPDATE", {
+//     orderId,
+//     prevStatus: order.status,
+//     newStatus: status,
+//   });
 
-  
-//     console.log("🔁 ORDER STATUS UPDATE", {
-//       orderId,
-//       prevStatus: order.status,
-//        newStatus: status,
-//     });
+//   // 🔒 Prevent double deduction
+//   if (order.status === "PAID" && status === "PAID") {
+//     return order;
+//   }
 
-//      if (order.status === "PAID" && status === "PAID") {
-//       return order;
-//     }
-
-//   // 2️⃣ UPDATE STOCK ONLY ON TRANSITION → PAID
-//   if (order.status !== "PAID" && order.status === "PAID") {
+//   // 2️⃣ REDUCE STOCK ONLY WHEN MOVING TO PAID
+//   if (order.status !== "PAID" && status === "PAID") {
 //     for (const item of order.items) {
 //       console.log("📦 REDUCING STOCK", item);
+
 //       const result = await Product.updateOne(
 //         {
 //           _id: item.productId,
-//           // "variants._id": item.variantId,
 //           "variants.label": item.variantLabel,
-//           "variants.stock": { $gte: item.quantity },
 //         },
 //         {
-//           $inc: { "variants.$.stock": -item.quantity },
+//           $inc: { "variants.$.stock": -Number(item.quantity) },
 //         }
 //       );
 
-//       // 🚨 SAFETY CHECK
+//       console.log("🧮 STOCK UPDATE RESULT", result);
+
 //       if (result.modifiedCount === 0) {
 //         throw new ApiError("Stock update failed", 500);
 //       }
@@ -229,10 +658,8 @@ async createFromCart(userId, data) {
 //   await order.save();
 
 //   await sendOrderStatusEmail(order);
-
 //   return order;
 // }
-
 
 async updateOrderStatus(orderId, status) {
   const allowedStatus = ["PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
@@ -244,10 +671,29 @@ async updateOrderStatus(orderId, status) {
   const order = await orderRepo.findById(orderId);
   if (!order) throw new ApiError("Order not found", 404);
 
+  console.log("📋 FULL ORDER DATA:", JSON.stringify(order, null, 2));
+
+  // 🔧 FIX: Handle missing shipping field for old orders
+  if (!order.shipping) {
+    console.log("⚠️ Order missing shipping field, creating...");
+    order.shipping = {
+      method: "COURIER",
+      charge: 0,
+      totalWeight: 0
+    };
+  }
+  
+  // 🔧 FIX: Handle missing shipping.method
+  if (!order.shipping.method) {
+    console.log("⚠️ Order missing shipping.method, setting default...");
+    order.shipping.method = "COURIER";
+  }
+
   console.log("🔁 ORDER STATUS UPDATE", {
     orderId,
     prevStatus: order.status,
     newStatus: status,
+    shippingMethod: order.shipping.method
   });
 
   // 🔒 Prevent double deduction
@@ -282,10 +728,125 @@ async updateOrderStatus(orderId, status) {
   order.status = status;
   await order.save();
 
-  // await sendOrderStatusEmail(order);
+  await sendOrderStatusEmail(order);
   return order;
 }
 
+
+async getTransportOrders() {
+  return orderRepo.findTransportOrders();
+}
+
+async assignBus(orderId, busData) {
+  const order = await orderRepo.findById(orderId);
+  if (!order) throw new ApiError("Order not found", 404);
+
+  if (order.shipping.method !== "TRANSPORT") {
+    throw new ApiError("Not a transport order", 400);
+  }
+
+  order.shipping.bus = {
+    ...busData,
+    status: "ASSIGNED",
+    assignedAt: new Date()
+  };
+
+  await order.save();
+  return order;
+}
+
+async updateTransportStatus(orderId, status) {
+  const allowed = ["IN_TRANSIT", "DELIVERED"];
+  if (!allowed.includes(status)) {
+    throw new ApiError("Invalid transport status", 400);
+  }
+
+  const order = await orderRepo.findById(orderId);
+  if (!order) throw new ApiError("Order not found", 404);
+
+  if (order.shipping.method !== "TRANSPORT") {
+    throw new ApiError("Not a transport order", 400);
+  }
+
+  if (!order.shipping.bus) {
+    throw new ApiError("Bus not assigned yet", 400);
+  }
+
+  order.shipping.bus.status = status;
+
+  // 🔥 If delivered → mark order delivered
+  if (status === "DELIVERED") {
+    order.status = "DELIVERED";
+  }
+
+  await order.save();
+  return order;
+}
+
+async assignCourier(orderId, courierData) {
+  // ✅ USE orderRepo (NOT order, NOT Order)
+  const order = await orderRepo.findById(orderId);
+
+  if (!order) {
+    throw new ApiError("Order not found", 404);
+  }
+
+  if (order.shipping.method !== "COURIER") {
+    throw new ApiError("Not a courier order", 400);
+  }
+
+  order.shipping.courier = {
+    company: courierData.company,
+    trackingNumber: courierData.trackingNumber,
+    trackingUrl: courierData.trackingUrl,
+    expectedDeliveryDate: courierData.expectedDeliveryDate,
+    status: "IN_TRANSIT",
+    assignedAt: new Date(),
+  };
+
+  // Optional but correct
+  order.status = "SHIPPED";
+
+  await order.save();
+  return order;
+}
+
+
+async updateCourierStatus(orderId, status) {
+  const allowed = ["IN_TRANSIT", "DELIVERED"];
+  if (!allowed.includes(status)) {
+    throw new ApiError("Invalid courier status", 400);
+  }
+
+  const order = await orderRepo.findById(orderId);
+  if (!order) throw new ApiError("Order not found", 404);
+
+  if (order.shipping.method !== "COURIER") {
+    throw new ApiError("Not a courier order", 400);
+  }
+
+  if (!order.shipping.courier) {
+    throw new ApiError("Courier not assigned yet", 400);
+  }
+
+  order.shipping.courier.status = status;
+
+  if (status === "DELIVERED") {
+    order.status = "DELIVERED";
+  }
+
+  await order.save();
+  return order;
+}
+
+
+async getCourierOrders() {
+  return Order.find({
+    "shipping.method": "COURIER"
+  })
+    .populate("userId", "name email")
+    .sort({ createdAt: -1 });
+}
 
 }
 
