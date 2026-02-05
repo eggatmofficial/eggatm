@@ -20,6 +20,7 @@ const cartSlice = createSlice({
         price: item.price,
         quantity: item.quantity,
         totalPrice: item.price * item.quantity,
+        weight: item.weight,
       }));
 
       state.totalQuantity = state.items.reduce(

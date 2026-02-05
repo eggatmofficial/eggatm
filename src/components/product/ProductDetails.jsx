@@ -1,3 +1,6 @@
+
+
+
 // import { useParams } from "react-router-dom";
 // import { useEffect, useRef, useState } from "react";
 // import * as productAPI from "../../api/product.api";
@@ -66,40 +69,85 @@
 //     })();
 //   }, [id]);
 
+//   // Function to get stock status
+//   const getStockStatus = (stock) => {
+//     if (stock === undefined || stock === null) {
+//       return {
+//         text: "In Stock",
+//         color: "text-green-600",
+//         bg: "bg-green-100",
+//         border: "border-green-200",
+//         badgeBg: "bg-gradient-to-r from-green-500 to-emerald-500",
+//         isAvailable: true
+//       };
+//     }
+    
+//     if (stock === 0) {
+//       return {
+//         text: "Out of Stock",
+//         color: "text-red-600",
+//         bg: "bg-red-100",
+//         border: "border-red-200",
+//         badgeBg: "bg-gradient-to-r from-red-500 to-pink-500",
+//         isAvailable: false
+//       };
+//     } else if (stock <= 5) {
+//       return {
+//         text: `Low Stock (${stock})`,
+//         color: "text-orange-600",
+//         bg: "bg-orange-100",
+//         border: "border-orange-200",
+//         badgeBg: "bg-gradient-to-r from-orange-500 to-yellow-500",
+//         isAvailable: true
+//       };
+//     } else {
+//       return {
+//         text: `In Stock (${stock})`,
+//         color: "text-green-600",
+//         bg: "bg-green-100",
+//         border: "border-green-200",
+//         badgeBg: "bg-gradient-to-r from-green-500 to-emerald-500",
+//         isAvailable: true
+//       };
+//     }
+//   };
+
+//   // Get current stock status
+//   const stockStatus = getStockStatus(selectedVariant?.stock);
+
 //   /* ---------- HANDLE ACTIONS ---------- */
-// const handleAddToCart = async () => {
-//   if (!product) return;
+//   const handleAddToCart = async () => {
+//     if (!product || !stockStatus.isAvailable) return;
 
-//   if (!isAuthenticated) {
-//     navigate("/login", {
-//       state: { from: `/products/${id}` },
-//     });
-//     return;
-//   }
+//     if (!isAuthenticated) {
+//       navigate("/login", {
+//         state: { from: `/products/${id}` },
+//       });
+//       return;
+//     }
 
-//   try {
-//     const payload = {
-//       productId: product._id,
-//       variantLabel: selectedVariant.label,
-//       quantity,
-//     };
+//     try {
+//       const payload = {
+//         productId: product._id,
+//         variantLabel: selectedVariant.label,
+//         quantity,
+//       };
 
-//     const res = await addToCartAPI(payload);
+//       const res = await addToCartAPI(payload);
 
-//     // 🔥 Redux mirrors backend cart
-//     dispatch(setCartFromBackend(res.data.data));
+//       // 🔥 Redux mirrors backend cart
+//       dispatch(setCartFromBackend(res.data.data));
 
-//     toast.success("Added to cart 🛒");
-//   } catch (error) {
-//     toast.error(
-//       error.response?.data?.message || "Failed to add to cart"
-//     );
-//   }
-// };
-
+//       toast.success("Added to cart 🛒");
+//     } catch (error) {
+//       toast.error(
+//         error.response?.data?.message || "Failed to add to cart"
+//       );
+//     }
+//   };
 
 //   const handleBuyNow = () => {
-//     if (!product) return;
+//     if (!product || !stockStatus.isAvailable) return;
 
 //     if (!isAuthenticated) {
 //       navigate("/login", {
@@ -230,7 +278,6 @@
 //   selectedVariant?.price ??
 //   0;
 
-
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50/30">
 //       {/* Floating Background Elements */}
@@ -291,20 +338,18 @@
 //                     className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
 //                   />
 
-//                  {/* 🔥 DISCOUNT BADGE */}
-//                   {/* {selectedVariant?.originalPrice > selectedVariant?.discountedPrice && (
-//                     <div className="absolute top-6 right-6 z-20">
-//                       <div className="px-4 py-2 rounded-full bg-red-600 text-white font-bold text-sm shadow-lg">
-//                         {product.discount?.type === "percentage"
-//                           ? `${product.discount.value}% OFF`
-//                           : `₹${product.discount.value} OFF`}
+//                   {/* Out of Stock Overlay */}
+//                   {!stockStatus.isAvailable && (
+//                     <div className="absolute inset-0 bg-black/60 z-20 flex items-center justify-center">
+//                       <div className="text-center p-6 bg-white/90 backdrop-blur-sm rounded-2xl">
+//                         <div className="text-2xl font-bold text-red-600 mb-2">Out of Stock</div>
+//                         <p className="text-gray-600">This product is currently unavailable</p>
 //                       </div>
 //                     </div>
-//                   )} */}
-
+//                   )}
 
 //                   {/* Zoom Lens */}
-//                   {zoom.active && (
+//                   {zoom.active && stockStatus.isAvailable && (
 //                     <div
 //                       ref={lensRef}
 //                       className="absolute pointer-events-none overflow-hidden rounded-full border-2 border-white shadow-2xl z-30"
@@ -328,16 +373,18 @@
 //                   )}
 
 //                   {/* Zoom Hint */}
-//                   <div className={`absolute bottom-6 right-6 z-20 transition-all duration-500 ${zoom.active ? 'opacity-0 translate-y-4' : 'opacity-100'}`}>
-//                     <div className="px-4 py-2 rounded-full bg-black/70 backdrop-blur-sm text-white text-sm flex items-center gap-2">
-//                       <span className="text-lg">🔍</span>
-//                       {window.innerWidth < 768 ? 'Touch & drag' : 'Hover to zoom'}
+//                   {stockStatus.isAvailable && (
+//                     <div className={`absolute bottom-6 right-6 z-20 transition-all duration-500 ${zoom.active ? 'opacity-0 translate-y-4' : 'opacity-100'}`}>
+//                       <div className="px-4 py-2 rounded-full bg-black/70 backdrop-blur-sm text-white text-sm flex items-center gap-2">
+//                         <span className="text-lg">🔍</span>
+//                         {window.innerWidth < 768 ? 'Touch & drag' : 'Hover to zoom'}
+//                       </div>
 //                     </div>
-//                   </div>
+//                   )}
 //                 </div>
 
 //                 {/* Lens Glow Effect */}
-//                 {zoom.active && (
+//                 {zoom.active && stockStatus.isAvailable && (
 //                   <div
 //                     className="absolute inset-0 rounded-3xl pointer-events-none z-10"
 //                     style={{
@@ -392,28 +439,34 @@
 //               <div className="bg-white rounded-2xl p-6 border border-amber-100 shadow-sm">
 //                 <h3 className="font-bold text-gray-900 text-lg mb-4">Select Variant</h3>
 //                 <div className="flex flex-wrap gap-3">
-//                   {product.variants.map((variant, index) => (
-//                     <button
-//                       key={index}
-//                       onClick={() => setSelectedVariant(variant)}
-//                       className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-//                         selectedVariant?.label === variant.label
-//                           ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'
-//                           : 'bg-gradient-to-r from-amber-50 to-orange-50 text-gray-800 hover:shadow-md'
-//                       }`}
-//                     >
-//                       <div className="text-center">
-//                         <div className="font-bold">{variant.label}</div>
-//                         <div className="text-sm mt-1">₹{variant.price}</div>
-//                       </div>
-//                     </button>
-//                   ))}
+//                   {product.variants.map((variant, index) => {
+//                     const variantStockStatus = getStockStatus(variant.stock);
+//                     return (
+//                       <button
+//                         key={index}
+//                         onClick={() => setSelectedVariant(variant)}
+//                         disabled={!variantStockStatus.isAvailable}
+//                         className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 relative ${
+//                           selectedVariant?.label === variant.label
+//                             ? `bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg ${!variantStockStatus.isAvailable ? 'opacity-70' : ''}`
+//                             : `bg-gradient-to-r from-amber-50 to-orange-50 text-gray-800 hover:shadow-md ${!variantStockStatus.isAvailable ? 'opacity-50 cursor-not-allowed' : ''}`
+//                         }`}
+//                       >
+//                         <div className="text-center">
+//                           <div className="font-bold">{variant.label}</div>
+//                           <div className="text-sm mt-1">₹{variant.price}</div>
+//                         </div>
+//                         {/* Stock status dot */}
+//                         <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${variantStockStatus.bg} border border-white`}></div>
+//                       </button>
+//                     );
+//                   })}
 //                 </div>
 //               </div>
 //             )}
 
 //             {/* Pricing */}
-//             <div className="bg-gradient-to-r from-white to-amber-50/50 rounded-3xl p-6 border border-amber-100">
+//             <div className={`bg-gradient-to-r from-white to-amber-50/50 rounded-3xl p-6 border ${stockStatus.border}`}>
 //               <div className="flex items-baseline gap-4 mb-2">
 //                 <span className="text-5xl font-bold text-gray-900">₹{productPrice}</span>
 
@@ -423,73 +476,137 @@
 //                   </span>
 //                 )}
 
-//                 <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold text-sm shadow-lg">
-//                   {selectedVariant?.stock ? `In Stock (${selectedVariant.stock})` : "In Stock"}
+//                 {/* Stock Status Badge */}
+//                 <span className={`px-4 py-1.5 rounded-full text-white font-bold text-sm shadow-lg ${stockStatus.badgeBg}`}>
+//                   {stockStatus.text}
 //                 </span>
 //               </div>
-//               {/* <p className="text-sm text-gray-500">Incl. all taxes • Free shipping above ₹499</p> */}
+//               {/* Stock Status Message */}
+//               {selectedVariant?.stock !== undefined && selectedVariant?.stock !== null && (
+//                 <div className={`mt-2 inline-block px-3 py-1 rounded-lg text-sm font-medium ${stockStatus.bg} ${stockStatus.color}`}>
+//                   {selectedVariant.stock === 0 ? (
+//                     <span className="flex items-center gap-1">
+//                       <span className="text-xl">😔</span> Currently unavailable
+//                     </span>
+//                   ) : selectedVariant.stock <= 5 ? (
+//                     <span className="flex items-center gap-1">
+//                       <span className="text-xl">⚠️</span> Hurry! Only {selectedVariant.stock} left
+//                     </span>
+//                   ) : (
+//                     <span className="flex items-center gap-1">
+//                       <span className="text-xl">✅</span> {selectedVariant.stock} units available
+//                     </span>
+//                   )}
+//                 </div>
+//               )}
 //             </div>
 
+//             {/* Discount Label */}
 //             {product.discount?.label && selectedVariant?.discountedPrice < selectedVariant?.originalPrice && (
-//             <div className="mt-2 inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm font-semibold">
-//            🎉 {product.discount.label}
-//             </div>
-//           )}
-
+//               <div className="mt-2 inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm font-semibold">
+//               🎉 {product.discount.label}
+//               </div>
+//             )}
 
 //             {/* Quantity Selector */}
-//             <div className="bg-white rounded-2xl p-6 border border-amber-100 shadow-sm">
-//               <h3 className="font-bold text-gray-900 text-lg mb-4">Select Quantity</h3>
-//               <div className="flex items-center gap-6">
-//                 <div className="flex items-center bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl overflow-hidden">
-//                   <button
-//                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
-//                     className="w-14 h-14 flex items-center justify-center text-2xl text-gray-700 hover:bg-amber-100 transition-colors active:scale-95"
-//                   >
-//                     −
-//                   </button>
-//                   <span className="w-20 text-center text-2xl font-bold text-gray-900">{quantity}</span>
-//                   <button
-//                     onClick={() => setQuantity(q => q + 1)}
-//                     className="w-14 h-14 flex items-center justify-center text-2xl text-gray-700 hover:bg-amber-100 transition-colors active:scale-95"
-//                   >
-//                     +
-//                   </button>
-//                 </div>
-//                 <div className="text-sm">
-//                   <span className="text-gray-600">Available: </span>
-//                   <span className="font-bold text-green-600">
-//                     {selectedVariant?.stock || "397"} units 🟢
-//                   </span>
+//             {stockStatus.isAvailable && (
+//               <div className="bg-white rounded-2xl p-6 border border-amber-100 shadow-sm">
+//                 <h3 className="font-bold text-gray-900 text-lg mb-4">Select Quantity</h3>
+//                 <div className="flex items-center gap-6">
+//                   <div className="flex items-center bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl overflow-hidden">
+//                     <button
+//                       onClick={() => setQuantity(q => Math.max(1, q - 1))}
+//                       disabled={quantity <= 1}
+//                       className="w-14 h-14 flex items-center justify-center text-2xl text-gray-700 hover:bg-amber-100 transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+//                     >
+//                       −
+//                     </button>
+//                     <span className="w-20 text-center text-2xl font-bold text-gray-900">{quantity}</span>
+//                     <button
+//                       onClick={() => setQuantity(q => q + 1)}
+//                       disabled={selectedVariant?.stock && quantity >= selectedVariant.stock}
+//                       className="w-14 h-14 flex items-center justify-center text-2xl text-gray-700 hover:bg-amber-100 transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+//                     >
+//                       +
+//                     </button>
+//                   </div>
+//                   <div className="text-sm">
+//                     <span className="text-gray-600">Available: </span>
+//                     <span className={`font-bold ${stockStatus.color}`}>
+//                       {selectedVariant?.stock || "397"} units {selectedVariant?.stock <= 5 ? "⚠️" : "🟢"}
+//                     </span>
+//                     {selectedVariant?.stock && quantity > selectedVariant.stock && (
+//                       <div className="text-red-500 text-xs mt-1">
+//                         ❌ Cannot exceed available stock
+//                       </div>
+//                     )}
+//                   </div>
 //                 </div>
 //               </div>
-//             </div>
+//             )}
 
 //             {/* Action Buttons */}
 //             <div className="space-y-4">
-//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//                 <button
-//                   onClick={handleAddToCart}
-//                   className="group flex items-center justify-center gap-3 py-4 px-8 rounded-2xl font-bold text-lg
-//                             transition-all duration-500 hover:shadow-2xl hover:scale-105 active:scale-95"
-//                   style={{ background: PRIMARY_GRADIENT }}
-//                 >
-//                   <FiShoppingCart className="text-xl group-hover:rotate-12 transition-transform" />
-//                   Add to Cart
-//                 </button>
+//               {stockStatus.isAvailable ? (
+//                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//                   <button
+//                     onClick={handleAddToCart}
+//                     disabled={selectedVariant?.stock === 0}
+//                     className="group flex items-center justify-center gap-3 py-4 px-8 rounded-2xl font-bold text-lg
+//                               transition-all duration-500 hover:shadow-2xl hover:scale-105 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+//                     style={{ background: PRIMARY_GRADIENT }}
+//                   >
+//                     <FiShoppingCart className="text-xl group-hover:rotate-12 transition-transform" />
+//                     Add to Cart
+//                   </button>
 
-//                 <button
-//                   onClick={handleBuyNow}
-//                   className="group flex items-center justify-center gap-3 py-4 px-8
-//                           rounded-2xl font-bold text-lg 
-//                          bg-gradient-to-r from-amber-500 to-orange-500 text-white
-//                           hover:shadow-2xl hover:scale-105 active:scale-95 transition-all"
-//                 >
-//                   <span className="text-xl">⚡</span>
-//                   Buy Now
-//                 </button>
-//               </div>
+//                   <button
+//                     onClick={handleBuyNow}
+//                     disabled={selectedVariant?.stock === 0}
+//                     className="group flex items-center justify-center gap-3 py-4 px-8
+//                             rounded-2xl font-bold text-lg 
+//                            bg-gradient-to-r from-amber-500 to-orange-500 text-white
+//                             hover:shadow-2xl hover:scale-105 active:scale-95 transition-all
+//                             disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+//                   >
+//                     <span className="text-xl">⚡</span>
+//                     Buy Now
+//                   </button>
+//                 </div>
+//               ) : (
+//                 <div className="border bg-gradient-to-r from-amber-300 to-orange-200 text-white border-red-200 rounded-2xl p-6 text-center">
+//                   <div className="text-red-600 text-2xl font-bold mb-2">Out of Stock</div>
+//                   <p className="text-gray-600 mb-4">This product is currently unavailable for purchase.</p>
+//                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
+//                     <button 
+//                       onClick={() => navigate("/products")}
+//                       className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-400 border border-amber-400 text-white rounded-xl font-medium hover:shadow-lg transition-all"
+//                     >
+//                       🔄 Browse Similar Products
+//                     </button>
+//                   </div>
+//                 </div>
+//               )}
 //             </div>
+
+//             {/* Stock Status Indicator */}
+//             {selectedVariant?.stock !== undefined && selectedVariant?.stock !== null && (
+//               <div className={`p-4 rounded-xl ${stockStatus.bg} ${stockStatus.border} border`}>
+//                 <div className="flex items-center gap-3">
+//                   <div className={`w-3 h-3 rounded-full ${stockStatus.badgeBg}`}></div>
+//                   <div>
+//                     <h4 className="font-bold text-gray-800">Stock Status</h4>
+//                     <p className={`text-sm ${stockStatus.color}`}>
+//                       {selectedVariant.stock === 0 
+//                         ? "This item is completely sold out. Check back later." 
+//                         : selectedVariant.stock <= 5 
+//                           ? `Only ${selectedVariant.stock} items left! Order soon to avoid disappointment.` 
+//                           : `Good availability with ${selectedVariant.stock} units in stock.`}
+//                     </p>
+//                   </div>
+//                 </div>
+//               </div>
+//             )}
 //           </div>
 //         </div>
 //       </div>
@@ -514,17 +631,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-//DEEPSEEK CODE
 
 
 import { useParams } from "react-router-dom";
@@ -694,9 +800,11 @@ const ProductDetails = () => {
         quantity,
         variantLabel: selectedVariant.label,
         totalPrice: price * quantity,
+        weight: selectedVariant?.weight ?? 0, 
       }
       ])
     );
+console.log("BUY NOW WEIGHT:", selectedVariant?.weight);
 
     navigate("/checkout");
   };

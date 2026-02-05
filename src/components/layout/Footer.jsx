@@ -534,7 +534,7 @@ const Footer = () => {
   const customerService = [
     { name: "Shipping Policy", icon: <FaTruck />, link: "/shipping-policy" },
     { name: "Contact Us", icon: <FaAddressCard />, link: "/contact" },
-    { name: "FAQ", icon: <FaInfoCircle />, link: "/contact" },
+    { name: "FAQ", icon: <FaInfoCircle />, link: "/faq" },
   ];
 
   const quickLinks = [
@@ -599,7 +599,7 @@ const Footer = () => {
     return styles;
   };
 
-  return (
+  return ( 
     <>
       <style>{getDynamicStyles()}</style>
       <footer className="relative bg-gray-900 text-gray-300 overflow-hidden">
@@ -631,7 +631,7 @@ const Footer = () => {
                     Premium quality food essentials. From farm to table, we bring tradition 
                     and taste together with the freshest ingredients delivered to your doorstep.
                   </p>
-                </div>
+                </div> 
                 
                 {/* Dynamic Social Links */}
                 <div className="space-y-3">

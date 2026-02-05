@@ -109,6 +109,10 @@ import PageLoader from "../components/common/PageLoader";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import UserLayout from "../components/layout/UserLayout";
 import AdminLayout from "../components/layout/AdminLayout";
+import AdminShipping from "../components/admin/AdminShipping.JSX";
+import FranchiseBranches from "../pages/admin/FranchiseBranches";
+import Faq from "../pages/Faq";
+
 
 
 // User Pages
@@ -157,6 +161,8 @@ const AppRoutes = () => {
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+           <Route path="/faq" element={<Faq />} />
+           <Route path="/franchise-branches" element={<FranchiseBranches />} />
         </Route>
 
         {/* ================= AUTH ================= */}
@@ -180,6 +186,7 @@ const AppRoutes = () => {
           <Route path="orders/:id" element={<AdminOrderDetails />} />
           <Route path="stocks" element={<AdminProductStock />} />
           <Route path="newsletter" element={<NewsletterList />} />
+          <Route path="shipping" element={<AdminShipping />} />
           <Route path="contacts" element={<ContactList />} />
         </Route>
 

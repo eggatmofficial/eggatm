@@ -1720,8 +1720,8 @@ const Contact = () => {
                           lineHeight: 1.5,
                           fontSize: '0.9rem'
                         }}>
-                          <div><strong>Mon - Fri:</strong> 9am - 11pm</div>
-                          <div><strong>Sat - Sun:</strong> 10am - 1am</div>
+                          <div><strong>Mon - Sat:</strong> 09:00 Am - 11.00 Pm</div>
+                          <div><strong>Sunday:</strong> 01:00 Pm - 11:00 Pm</div>
                           <div style={{ 
                             fontSize: '0.85rem', 
                             color: '#FF6B35', 
