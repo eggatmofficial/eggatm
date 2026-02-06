@@ -506,6 +506,74 @@ async createFromCart(userId, data) {
 //     }
 //   });
 // }
+// async _createOrder(userId, items, address, source, shippingMethod) {
+//   let totalAmount = 0;
+//   let totalWeight = 0;
+//   const orderItems = [];
+
+//   for (const item of items) {
+//     if (!item.quantity || item.quantity <= 0) {
+//       throw new ApiError("Invalid quantity", 400);
+//     }
+
+//     const product = await Product.findById(item.productId);
+//     if (!product || !product.isActive) {
+//       throw new ApiError("Product unavailable", 400);
+//     }
+
+//     const variant = product.variants.find(
+//       (v) => v.label === item.variantLabel
+//     );
+
+//     if (!variant || variant.stock < item.quantity) {
+//       throw new ApiError("Insufficient stock", 400);
+//     }
+
+//     const finalPrice = getFinalPrice(product, variant);
+//     const subtotal = finalPrice * item.quantity;
+//     totalAmount += subtotal;
+
+//     const weightInGrams =
+//       variant.unit === "kg"
+//         ? variant.weight * 1000
+//         : variant.weight;
+
+//     totalWeight += weightInGrams * item.quantity;
+
+//     orderItems.push({
+//       productId: item.productId,
+//       variantId: variant._id,
+//       variantLabel: item.variantLabel,
+//       price: finalPrice,
+//       quantity: item.quantity,
+//       subtotal,
+//     });
+//   }
+
+//   // 🔥 CALCULATE SHIPPING CHARGE
+//   const shippingCharge = await calculateShippingCharge(
+//     shippingMethod,
+//     totalWeight
+//   );
+
+//   return orderRepo.create({
+//     userId,
+//     items: orderItems,
+//     totalAmount: totalAmount + shippingCharge,
+//     address,
+//     source,
+//     status: "CREATED",
+//     shipping: {
+//       method: shippingMethod,
+//       charge: shippingCharge,
+//       totalWeight,
+
+//       ...(shippingMethod === "TRANSPORT" && { bus: {} }),
+//       ...(shippingMethod === "COURIER" && { courier: {} })
+//     },
+//   });
+// }
+
 async _createOrder(userId, items, address, source, shippingMethod) {
   let totalAmount = 0;
   let totalWeight = 0;
@@ -533,12 +601,32 @@ async _createOrder(userId, items, address, source, shippingMethod) {
     const subtotal = finalPrice * item.quantity;
     totalAmount += subtotal;
 
-    const weightInGrams =
-      variant.unit === "kg"
-        ? variant.weight * 1000
-        : variant.weight;
+    // const weightInGrams =
+    //   variant.unit === "kg"
+    //     ? variant.weight * 1000
+    //     : variant.weight;
 
-    totalWeight += weightInGrams * item.quantity;
+    // totalWeight += weightInGrams * item.quantity;
+
+    console.log("items",items);
+    
+
+// ✅ WEIGHT CALCULATION FROM VARIANT
+if (!variant.weight || variant.weight <= 0) {
+  throw new ApiError("Variant weight missing", 500);
+}
+
+const weightInGrams =
+  variant.unit === "kg"
+    ? variant.weight * 1000
+    : variant.weight;
+
+totalWeight += weightInGrams * item.quantity;
+
+
+console.log("shipping debug",totalWeight,shippingMethod,item.quantity);
+
+
 
     orderItems.push({
       productId: item.productId,
@@ -573,6 +661,7 @@ async _createOrder(userId, items, address, source, shippingMethod) {
     },
   });
 }
+
 
 
 
@@ -728,7 +817,9 @@ async updateOrderStatus(orderId, status) {
   order.status = status;
   await order.save();
 
-  await sendOrderStatusEmail(order);
+  // await sendOrderStatusEmail(order);
+
+  
   return order;
 }
 
