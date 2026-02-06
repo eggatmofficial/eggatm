@@ -800,7 +800,7 @@ const ProductDetails = () => {
         quantity,
         variantLabel: selectedVariant.label,
         totalPrice: price * quantity,
-        weight: selectedVariant?.weight ?? 0, 
+         weight:(selectedVariant?.unit === "kg"  ? selectedVariant?.weight * 1000  : selectedVariant?.weight) ,
       }
       ])
     );

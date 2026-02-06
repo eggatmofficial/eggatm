@@ -563,7 +563,7 @@ const Cart = () => {
                 {[
                   {
                     icon: <FiCheckCircle />,
-                    title: "Egg! ATM Standard",
+                    title: "EGG! ATM Standard",
                     desc: "Premium Grade",
                     color: "from-amber-500 to-orange-500",
                     bg: "from-amber-50 to-orange-50",
@@ -614,7 +614,7 @@ const Cart = () => {
               {[
                   {
                     icon: <FiCheckCircle />,
-                    title: "Egg! ATM Standard",
+                    title: "EGG! ATM Standard",
                     desc: "Premium Grade",
                     color: "from-amber-500 to-orange-500",
                     bg: "from-amber-50 to-orange-50",

@@ -2554,10 +2554,10 @@ const Profile = () => {
                                   {step.description}
                                 </p>
                               </div>
-                              <div className="flex items-center gap-1 text-xs text-gray-500">
+                              {/* <div className="flex items-center gap-1 text-xs text-gray-500">
                                 <FiClock className="text-gray-400" />
                                 <span>{getEstimatedTime(selectedOrder.createdAt, index)}</span>
-                              </div>
+                              </div> */}
                             </div>
                             
                             {/* Success Message for delivered orders */}

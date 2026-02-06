@@ -1012,7 +1012,11 @@ useEffect(() => {
   api.post("/shipping/estimate", {
     shippingMethod,
     items: itemsToCheckout.map(i => ({
-     weight: i.weight || i.productId?.weight || 0,
+     weight:
+  i.weight ||
+  i.variant?.weight ||
+  i.productId?.variants?.find(v => v.label === i.variantLabel)?.weight ||
+  0,
      quantity: i.quantity,
     })),
   }).then(res => {
@@ -1357,12 +1361,12 @@ if (isBuyNow) {
               Checkout
             </h1>
           </div>
-          <button
+          {/* <button
             onClick={() => navigate("/profile/addresses")}
             className="text-xs text-orange-600 hover:text-orange-700 font-medium"
           >
             Manage Address
-          </button>
+          </button> */}
         </div>
       )}
 

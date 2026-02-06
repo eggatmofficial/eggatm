@@ -121,7 +121,7 @@ const Header = () => {
               <Link to="/aboutus" onClick={() => setMenuOpen(false)}>About Us</Link>
               <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact Us</Link>
               <Link to="/franchise" onClick={()=> setMenuOpen(false)}>Franchise</Link>
-              <Link to="/franchise-branches" onClick={() => setMenuOpen(false)}>Branches</Link>
+              <Link to="/franchise-branches" onClick={() => setMenuOpen(false)}>Outlets</Link>
               {isAuthenticated && user?.role === 'franchise' && (
                 <Link to="/franchise-dashboard" onClick={() => setMenuOpen(false)} className="franchise-nav">
                   <FaStore className="icon-small" /> Dashboard

@@ -1168,7 +1168,27 @@ import mBanner5 from "../../assets/banners/mobile/banner5.png";
 import mBanner6 from "../../assets/banners/mobile/banner6.png";
 
 const banners = [
-  {
+  // {
+  //   desktopImage: banner1,
+  //   mobileImage: mBanner1,
+  //   title: "MUTTA MITTAI",
+  //   subtitle: "Our Signature Egg Sweet",
+  //   desc: "Fresh • Hot • Famous",
+  //   buttonText: "Taste the Tradition",
+  //   buttonLink: "/contact",
+  //   animationStyle: "heroSmash"
+  // },
+    {
+    desktopImage: banner6,
+    mobileImage: mBanner6,
+    title: "Start Your Own Franchise",
+    subtitle: "Low Investment • High Profit",
+    desc: "Join the fastest growing egg snack brand",
+    buttonText: "Learn More",
+    buttonLink: "/franchise",
+    animationStyle: "orangeGradient" 
+  },
+    {
     desktopImage: banner1,
     mobileImage: mBanner1,
     title: "MUTTA MITTAI",
@@ -1181,7 +1201,7 @@ const banners = [
   {
     desktopImage: banner2,
     mobileImage: mBanner2,
-    title: "Egg Based Snaccks",
+    title: "Egg Based Snacks",
     subtitle: "Everyone Loves",
     desc: "Egg Chilli • Lollipop • Fried Rice",
     buttonText: "Sweet with a Twist",
@@ -1218,16 +1238,17 @@ const banners = [
     buttonLink: "/products",
     animationStyle: "cartoonNetwork"
   },
-  {
-    desktopImage: banner6,
-    mobileImage: mBanner6,
-    title: "Start Your Own Franchise",
-    subtitle: "Low Investment • High Profit",
-    desc: "Join the fastest growing egg snack brand",
-    buttonText: "Learn More",
-    buttonLink: "/franchise",
-    animationStyle: "orangeGradient" 
-  }
+  
+  // {
+  //   desktopImage: banner6,
+  //   mobileImage: mBanner6,
+  //   title: "Start Your Own Franchise",
+  //   subtitle: "Low Investment • High Profit",
+  //   desc: "Join the fastest growing egg snack brand",
+  //   buttonText: "Learn More",
+  //   buttonLink: "/franchise",
+  //   animationStyle: "orangeGradient" 
+  // }
 ];
 
 // ====================================

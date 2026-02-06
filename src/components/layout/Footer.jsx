@@ -743,7 +743,10 @@ const Footer = () => {
                             {info.icon}
                           </span>
                         </div>
-                        <span className="text-gray-400 text-xs sm:text-sm break-words">
+                        {/* <span className="text-gray-400 text-xs sm:text-sm break-words">
+                          {info.text}
+                        </span> */}
+                        <span className="text-gray-400 text-xs sm:text-[15px] break-all leading-relaxed">
                           {info.text}
                         </span>
                       </div>

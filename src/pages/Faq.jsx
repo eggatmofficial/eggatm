@@ -218,7 +218,7 @@ const Faq = () => {
 
       {/* 📱 STICKY WHATSAPP */}
 <a
-  href="https://wa.me/911234567890?text=Hi%20I%20am%20interested%20in%20Egg!%20ATM%20Franchise"
+  href="https://wa.me/919629861885?text=Hi%20I%20am%20interested%20in%20Egg!%20ATM%20Franchise"
   target="_blank"
   rel="noopener noreferrer"
   aria-label="Chat on WhatsApp for Egg! ATM Franchise"
