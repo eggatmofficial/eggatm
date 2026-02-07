@@ -1328,6 +1328,7 @@ const Checkout = () => {
           setProcessingMessage("Confirming your payment...");
 
           try {
+            // Step 1: Verify payment
             await verify({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -1336,22 +1337,28 @@ const Checkout = () => {
 
             setProcessingMessage("Finalizing your order...");
 
-            // ✅ Only refresh cart after successful payment verification
+            // Step 2: Refresh cart for cart-based orders
             if (!isBuyNow) {
-              console.log("🔄 Refreshing cart after successful payment");
-              const cartRes = await getCartAPI();
-              dispatch(setCartFromBackend(cartRes.data.data));
+              console.log("🛒 Refreshing cart after successful payment");
+              await refreshCartAfterPayment();
             }
 
+            // Step 3: Show success message
             toast.success("Payment Successful! Order confirmed.");
-            setTimeout(() => {
-              navigate("/products");
-            }, 2000);
+            
+            // Step 4: Navigate after short delay
+          // Step 4: Navigate + force refresh
+setTimeout(() => {
+  dispatch(clearCart());          // safety
+  navigate("/products", { replace: true });
+  navigate(0);                    // 🔥 force refresh
+}, 300);
+
+            
           } catch (verifyError) {
             console.error("Payment verification failed:", verifyError);
             toast.error("Payment verification failed. Please contact support.");
             
-            // ❌ Don't refresh cart if payment failed
             setPaymentSuccess(false);
             setIsPlacingOrder(false);
           }
@@ -1361,7 +1368,6 @@ const Checkout = () => {
           ondismiss: function() {
             toast.error("Payment cancelled");
             setIsPlacingOrder(false);
-            // Cart items are preserved because we didn't remove them yet
             console.log("🛒 Payment cancelled, cart items preserved");
           }
         }
