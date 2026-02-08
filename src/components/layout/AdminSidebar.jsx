@@ -16,7 +16,8 @@ import {
   FiChevronRight,
   FiBox,
   FiMapPin,
-  FiSend
+  FiSend,
+  FiBriefcase
 } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { logout } from "../../store/auth.store";
@@ -73,6 +74,7 @@ const AdminSidebar = () => {
     { to: "/admin/dashboard", icon: <FiHome />, label: "Dashboard" },
     { to: "/admin/products", icon: <FiShoppingBag />, label: "Products" },
     { to: "/admin/users", icon: <FiUsers />, label: "Users" },
+    { to: "/admin/outlets", icon: <FiMapPin />, label: "Outlets" },
     { to: "/admin/orders", icon: <FiPackage />, label: "Orders" },
     { to: "/admin/shipping", icon: < FiSend />, label: "Shipping" },
     { to: "/admin/stocks", icon: <FiTrendingUp />, label: "Stocks" },

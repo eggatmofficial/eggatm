@@ -1153,19 +1153,19 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-import banner1 from "../../assets/banners/desktop/banner1.png";
-import banner2 from "../../assets/banners/desktop/banner2.png";
-import banner3 from "../../assets/banners/desktop/banner3.png";
-import banner4 from "../../assets/banners/desktop/banner4.png";
-import banner5 from "../../assets/banners/desktop/banner5.png";
-import banner6 from "../../assets/banners/desktop/banner6.png";
+import banner1 from "../../assets/banners/desktop/banner1.webp";
+import banner2 from "../../assets/banners/desktop/banner2.webp";
+import banner3 from "../../assets/banners/desktop/banner3.webp";
+import banner4 from "../../assets/banners/desktop/banner4.webp";
+import banner5 from "../../assets/banners/desktop/banner5.webp";
+import banner6 from "../../assets/banners/desktop/banner6.webp";
 
-import mBanner1 from "../../assets/banners/mobile/banner1.png";
-import mBanner2 from "../../assets/banners/mobile/banner2.png";
-import mBanner3 from "../../assets/banners/mobile/banner31.png";
-import mBanner4 from "../../assets/banners/mobile/banner4.png";
-import mBanner5 from "../../assets/banners/mobile/banner5.png";
-import mBanner6 from "../../assets/banners/mobile/banner6.png";
+import mBanner1 from "../../assets/banners/mobile/banner1.webp";
+import mBanner2 from "../../assets/banners/mobile/banner2.webp";
+import mBanner3 from "../../assets/banners/mobile/banner3.webp";
+import mBanner4 from "../../assets/banners/mobile/banner4.webp";
+import mBanner5 from "../../assets/banners/mobile/banner5.webp";
+import mBanner6 from "../../assets/banners/mobile/banner6.webp";
 
 const banners = [
   // {

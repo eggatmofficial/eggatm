@@ -112,6 +112,7 @@ import AdminLayout from "../components/layout/AdminLayout";
 import AdminShipping from "../components/admin/AdminShipping.JSX";
 import FranchiseBranches from "../pages/admin/FranchiseBranches";
 import Faq from "../pages/Faq";
+import FranchiseAdmin from "../pages/admin/FranchiseAdmin";
 
 
 
@@ -188,6 +189,7 @@ const AppRoutes = () => {
           <Route path="newsletter" element={<NewsletterList />} />
           <Route path="shipping" element={<AdminShipping />} />
           <Route path="contacts" element={<ContactList />} />
+           <Route path="outlets" element={<FranchiseAdmin />} />
         </Route>
 
         {/* ================= 404 ================= */}
