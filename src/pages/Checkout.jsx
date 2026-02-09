@@ -2799,13 +2799,13 @@ setTimeout(() => {
                             Qty: {item.quantity}
                           </span>
                         </div>
-                        <div className="text-xs text-gray-500 mt-1 sm:mt-0">
+                        {/* <div className="text-xs text-gray-500 mt-1 sm:mt-0">
                           {item.hasDiscount ? (
                             <span>₹{item.price} each (was ₹{item.originalPrice})</span>
                           ) : (
                             <span>₹{item.price} each</span>
                           )}
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -2813,7 +2813,7 @@ setTimeout(() => {
               </div>
               
               {/* Price Summary */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+              {/* <div className="mt-6 p-4 bg-gray-50 rounded-xl">
                 <div className="space-y-2">
                   {totalDiscount > 0 && (
                     <div className="flex justify-between items-center">
@@ -2834,7 +2834,7 @@ setTimeout(() => {
                     <span className="text-lg font-bold text-orange-600">₹{totalAmount}</span>
                   </div>
                 </div>
-              </div>
+              </div> */}
               
               {/* Continue Button for Step 1 */}
               {activeStep === 1 && (
@@ -2981,13 +2981,13 @@ setTimeout(() => {
                     </div>
                     <div className="text-right">
                       <div className="text-xl font-bold text-orange-600">₹{totalAmount}</div>
-                      <div className="text-sm text-gray-500">
+                      {/* <div className="text-sm text-gray-500">
                         ₹{subtotal} + ₹{shippingCharge} shipping
-                      </div>
+                      </div> */}
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <FiAlertCircle className="text-blue-500 mt-0.5" />
                       <div>
@@ -2997,7 +2997,7 @@ setTimeout(() => {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Navigation buttons for Step 4 */}
