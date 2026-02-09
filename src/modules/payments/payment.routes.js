@@ -9,6 +9,6 @@ router.post("/initiate",authMiddleware,controller.initiatePayment);
 
 router.post("/verify", authMiddleware, controller.verifyPayment);
 
-router.post("/webhook",express.raw({ type: "application/json" }), webhookHandler );
+// router.post("/webhook",express.raw({ type: "application/json" }), webhookHandler );
 
 module.exports = router;

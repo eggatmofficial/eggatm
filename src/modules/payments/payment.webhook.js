@@ -7,13 +7,19 @@ const ApiError = require("../utils/ApiError");
 
 const paymentWebhook = async (req, res) => {
   try {
+
+    console.log("🔥 WEBHOOK HIT");
+    console.log("Headers:", req.headers);
+    console.log("Raw body:", req.body.toString());
+    
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
     const receivedSignature = req.headers["x-razorpay-signature"];
 
     const expectedSignature = crypto
       .createHmac("sha256", webhookSecret)
-      .update(JSON.stringify(req.body))
+      // .update(JSON.stringify(req.body))
+      .update(req.body)
       .digest("hex");
 
     if (expectedSignature !== receivedSignature) {
