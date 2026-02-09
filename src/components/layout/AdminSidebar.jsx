@@ -56,7 +56,7 @@ const AdminSidebar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/");
+    // navigate("/");
   };
 
   const toggleSidebar = () => {

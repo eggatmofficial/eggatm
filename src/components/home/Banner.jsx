@@ -1716,7 +1716,8 @@ const OrangeGradientTitle = ({ text, isMobile = false }) => (
                 #FFD700 100%
             )`,
             WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            // WebkitTextFillColor: 'transparent',
+            WebkitTextFillColor: '#FFF6E5 ',
             backgroundClip: 'text',
             textShadow: isMobile
               ? `1px 1px 2px rgba(0,0,0,0.3)`

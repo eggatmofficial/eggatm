@@ -18,7 +18,8 @@ const ProtectedAdminRoute = ({ children }) => {
 
   // Not logged in
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    // return <Navigate to="/login" replace state={{ from: location }} />;
+    return <Navigate to="/" replace />;
   }
 
   // Logged in but not admin

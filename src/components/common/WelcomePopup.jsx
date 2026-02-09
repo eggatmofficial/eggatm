@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import gsap from "gsap";
 import logo from "../../assets/imges/popuplogo.png";
 
-const WelcomePopup = () => {
+const WelcomePopup = ({ onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -12,74 +12,46 @@ const WelcomePopup = () => {
   const eggRef = useRef(null);
   const glowRef = useRef(null);
 
-  const [showPopup, setShowPopup] = useState(false);
   const [greeting, setGreeting] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [actionText, setActionText] = useState("Login to Continue");
   const [actionPath, setActionPath] = useState("/login");
 
-  localStorage.clear()
-
-/* ===============================
-   ONCE PER DAY + 5s DELAY
-=============================== */
-useEffect(() => {
-  const lastShown = localStorage.getItem("welcomePopupDate");
-  const today = new Date().toDateString();
-
-  if (lastShown !== today) {
-    const timer = setTimeout(() => {
-      setShowPopup(true);
-      localStorage.setItem("welcomePopupDate", today);
-    }, 8000); // ⏱️ 5 seconds delay
-
-    return () => clearTimeout(timer);
-  }
-}, []);
-
-
   /* ===============================
      MESSAGE LOGIC
   =============================== */
-useEffect(() => {
-  const isNewUser = !localStorage.getItem("visitedBefore");
-  const isFranchise = location.pathname.includes("franchise");
+  useEffect(() => {
+    const isNewUser = !localStorage.getItem("visitedBefore");
+    const isFranchise = location.pathname.includes("franchise");
 
-  // 🏢 FRANCHISE PAGE
-  if (isFranchise) {
-    setGreeting("Start Your Franchise Journey");
-    setSubtitle("Partner with EGG! ATM and grow your business with us.");
-    setActionText("Explore Franchise");
-    setActionPath("/franchise");
-    return;
-  }
+    if (isFranchise) {
+      setGreeting("Start Your Franchise Journey");
+      setSubtitle("Partner with EGG! ATM and grow your business with us.");
+      setActionText("Explore Franchise");
+      setActionPath("/franchise");
+      return;
+    }
 
-  // 🆕 NEW USER (NO LOGIN WORDING)
-  if (isNewUser) {
-    setGreeting("Welcome to EGG! ATM ");
-    setSubtitle(
-      "Discover fresh products and explore exciting franchise opportunities."
-    );
-    setActionText("Explore our Francise");
-    setActionPath("/franchise");
-
-    localStorage.setItem("visitedBefore", "true");
-  }
-  // 🔁 EXISTING USER
-  else {
-    setGreeting("Welcome Back 👋");
-    setSubtitle("Login to continue your shopping experience.");
-    setActionText("Login to Continue");
-    setActionPath("/login");
-  }
-}, [location.pathname]);
+    if (isNewUser) {
+      setGreeting("Welcome to EGG! ATM ");
+      setSubtitle(
+        "Discover fresh products and explore exciting franchise opportunities."
+      );
+      setActionText("Explore our Francise");
+      setActionPath("/franchise");
+      localStorage.setItem("visitedBefore", "true");
+    } else {
+      setGreeting("Welcome Back 👋");
+      setSubtitle("Login to continue your shopping experience.");
+      setActionText("Login to Continue");
+      setActionPath("/login");
+    }
+  }, [location.pathname]);
 
   /* ===============================
-     POPUP ANIMATION
+     GSAP ANIMATION
   =============================== */
   useEffect(() => {
-    if (!showPopup) return;
-
     gsap.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3 });
 
     gsap.fromTo(
@@ -94,7 +66,6 @@ useEffect(() => {
       }
     );
 
-    // 🥚 Egg breathe animation
     const eggTl = gsap.timeline({ repeat: -1, yoyo: true });
 
     eggTl
@@ -120,10 +91,8 @@ useEffect(() => {
       ease: "sine.inOut",
     });
 
-    return () => {
-      eggTl.kill();
-    };
-  }, [showPopup]);
+    return () => eggTl.kill();
+  }, []);
 
   const closePopup = () => {
     gsap.to(popupRef.current, {
@@ -132,18 +101,15 @@ useEffect(() => {
       opacity: 0,
       duration: 0.4,
       ease: "power2.in",
-      onComplete: () => setShowPopup(false),
+      onComplete: onClose,
     });
   };
-
-  if (!showPopup) return null;
 
   return (
     <div ref={overlayRef} className="welcome-overlay">
       <div ref={popupRef} className="welcome-popup">
         <button className="close-btn" onClick={closePopup}>✕</button>
 
-        {/* 🥚 Animated Egg */}
         <div className="egg-wrapper" ref={eggRef}>
           <span ref={glowRef} className="egg-glow" />
           <img src={logo} alt="logo" className="welcome-logo" />
@@ -152,11 +118,20 @@ useEffect(() => {
         <h2>{greeting}</h2>
         <p>{subtitle}</p>
 
-        <button className="action-btn" onClick={() => navigate(actionPath)}>
+        <button
+          className="action-btn"
+          onClick={() => {
+            closePopup();
+            navigate(actionPath);
+          }}
+        >
           {actionText}
         </button>
       </div>
 
+      {/* ===============================
+          INLINE CSS (SAME DESIGN)
+      =============================== */}
       <style>{`
         .welcome-overlay {
           position: fixed;
@@ -178,6 +153,20 @@ useEffect(() => {
           backdrop-filter: blur(20px);
           box-shadow: 0 25px 60px rgba(0,0,0,.25);
           position: relative;
+        }
+
+        .close-btn {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(255,255,255,.9);
+          font-size: 18px;
+          cursor: pointer;
+          box-shadow: 0 6px 14px rgba(0,0,0,.15);
         }
 
         .egg-wrapper {
@@ -242,20 +231,6 @@ useEffect(() => {
           transform: translateY(-2px);
         }
 
-        .close-btn {
-          position: absolute;
-          top: 14px;
-          right: 14px;
-          width: 34px;
-          height: 34px;
-          border-radius: 50%;
-          border: none;
-          background: rgba(255,255,255,.9);
-          font-size: 18px;
-          cursor: pointer;
-          box-shadow: 0 6px 14px rgba(0,0,0,.15);
-        }
-
         @media (max-width: 640px) {
           .welcome-overlay {
             align-items: flex-end;
@@ -269,10 +244,10 @@ useEffect(() => {
       `}</style>
     </div>
   );
-
 };
 
 export default WelcomePopup;
+
 
 
 
